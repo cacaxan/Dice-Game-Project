@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 1784034}
   - component: {fileID: 1784033}
   m_Layer: 5
-  m_Name: DiceSlot3
+  m_Name: PlayerDiceSlot3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -278,9 +278,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 634884011}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 20
+  m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 20
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -396,7 +396,7 @@ GameObject:
   - component: {fileID: 128357393}
   - component: {fileID: 128357392}
   m_Layer: 5
-  m_Name: DiceSlot2
+  m_Name: PlayerDiceSlot2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1160,8 +1160,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 989f9d44fb283be49a2af6a2bc1e6782, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 20
+  characterName: Naruto
   maxHealth: 20
+  health: 20
+  defense: 0
+  healthBar: {fileID: 1563749312}
+  healthText: {fileID: 505123700}
   rerolls: 0
   maxRerolls: 2
   dice: {fileID: 11400000, guid: 6887147d7db4a1d4e8a6bb870d5bd1e8, type: 2}
@@ -1174,8 +1178,6 @@ MonoBehaviour:
   rerollText: {fileID: 1881129247}
   confirmButton: {fileID: 0}
   rerollButton: {fileID: 0}
-  healthSlider: {fileID: 1563749312}
-  healthText: {fileID: 505123700}
   referencePanel: {fileID: 92065041}
   diceFaceSlotPrefab: {fileID: 105820208325987901, guid: 7f2b4854ddeaff9409218e053e4270d5, type: 3}
 --- !u!1 &763519105
@@ -1401,7 +1403,7 @@ GameObject:
   - component: {fileID: 816683518}
   - component: {fileID: 816683517}
   m_Layer: 5
-  m_Name: DiceSlot3
+  m_Name: EnemyDiceSlot3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1793,6 +1795,7 @@ MonoBehaviour:
   state: 0
   player: {fileID: 700174450}
   enemy: {fileID: 1388246257}
+  resolveDelay: 0.5
 --- !u!1 &991958105
 GameObject:
   m_ObjectHideFlags: 0
@@ -1805,7 +1808,7 @@ GameObject:
   - component: {fileID: 991958108}
   - component: {fileID: 991958107}
   m_Layer: 5
-  m_Name: DiceSlot1
+  m_Name: EnemyDiceSlot1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2282,19 +2285,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e4f0942f2cd3f0488de55c81f775d06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 15
+  characterName: Sasuke
   maxHealth: 15
+  health: 15
+  defense: 0
+  healthBar: {fileID: 72856268}
+  healthText: {fileID: 1996342513}
+  rerolls: 0
+  maxRerolls: 2
   dice: {fileID: 11400000, guid: d09a645192bb90842a6748c77bf88e43, type: 2}
-  currentRolls: []
   diceManager: {fileID: 942393037}
+  currentRolls: []
   diceSlots:
   - {fileID: 991958107}
   - {fileID: 2008795636}
   - {fileID: 816683517}
   referencePanel: {fileID: 1476104840}
   diceFaceSlotPrefab: {fileID: 105820208325987901, guid: 7f2b4854ddeaff9409218e053e4270d5, type: 3}
-  healthSlider: {fileID: 72856268}
-  healthText: {fileID: 1996342513}
 --- !u!1 &1476104839
 GameObject:
   m_ObjectHideFlags: 0
@@ -2581,7 +2588,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.0000085831, y: -17}
+  m_AnchoredPosition: {x: 4, y: -18}
   m_SizeDelta: {x: 624.2423, y: 46.6484}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1563749312
@@ -2629,9 +2636,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1667977829}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 20
+  m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 20
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -3370,7 +3377,7 @@ GameObject:
   - component: {fileID: 2008795637}
   - component: {fileID: 2008795636}
   m_Layer: 5
-  m_Name: DiceSlot2
+  m_Name: EnemyDiceSlot2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3483,7 +3490,7 @@ GameObject:
   - component: {fileID: 2116009757}
   - component: {fileID: 2116009756}
   m_Layer: 5
-  m_Name: DiceSlot1
+  m_Name: PlayerDiceSlot1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

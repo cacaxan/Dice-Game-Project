@@ -1,115 +1,112 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 
-public class EnemyController : MonoBehaviour
+/// <summary>
+/// Controla al enemigo: lanzamiento automático de dados, resolución de efectos y UI.
+/// Hereda de Character.
+/// </summary>
+public class EnemyController : Character
 {
-    public int health = 15;
-    public int maxHealth = 15;
-
+    [Header("Dice Settings")]
     public DiceData dice;
-    public List<DiceFace> currentRolls = new List<DiceFace>();
     public DiceManager diceManager;
 
-    public Image[] diceSlots; //UI
+    [Header("Dice UI")]
+    public List<DiceFace> currentRolls = new List<DiceFace>();
+    private int diceIndex = 0;
+    public Image[] diceSlots;
 
-    //Para ver TODAS las posibles carasdel dado 
-    public Transform referencePanel;      // Panel con GridLayoutGroup del enemigo
-    public GameObject diceFaceSlotPrefab; // Prefab del slot de dado
+    [Header("Reference Panel")]
+    public Transform referencePanel;
+    public GameObject diceFaceSlotPrefab;
 
-    // UI: Health
-    public Slider healthSlider;
-    public TMP_Text healthText;
-
-
-    //Para ver TODAS las posibles carasdel dado 
-    public void ShowAllDiceFaces()
-    {
-        foreach(Transform child in referencePanel)
-            Destroy(child.gameObject);
-
-        foreach(var face in dice.faces)
-        {
-            GameObject slot = Instantiate(diceFaceSlotPrefab, referencePanel);
-            slot.GetComponent<Image>().sprite = face.icon;
-        }
-    }
-
-    public void UpdateHealthUI()
-    {
-        if (healthSlider != null)
-            healthSlider.value = Mathf.Clamp(health, 0, maxHealth);
-
-        if (healthText != null)
-            healthText.text = $"HP: {Mathf.Max(health,0)}/{maxHealth}";
-    }
-
-    void Start()
-    {
-        health = maxHealth;
-        if (healthSlider != null)
-            healthSlider.maxValue = maxHealth;
-
-        UpdateHealthUI();
-        ShowAllDiceFaces();
-    }
-
-
-    // Indica si el enemigo terminó de lanzar sus 3 dados
-    public bool HasRolledAllDice()
-    {
-        return currentRolls.Count >= 3;
-    }
-
-    // Lanza los 3 dados al inicio de su turno
+    // ------------------------- TURN FLOW -------------------------
     public void StartTurn()
     {
         currentRolls.Clear();
-        for (int i = 0; i < 3; i++)
+        diceIndex = 0;
+        StartCoroutine(RollAllDiceCoroutine(0.3f)); // animación automática
+    }
+
+    // Lanza todos los dados con delay para que se vea en UI
+    public IEnumerator RollAllDiceCoroutine(float delay = 0.3f)
+    {
+        currentRolls.Clear();
+        diceIndex = 0;
+
+        while (diceIndex < diceSlots.Length)
         {
             DiceFace roll = diceManager.Roll(dice);
             currentRolls.Add(roll);
-            Debug.Log($"Enemy rolled slot {i + 1}: {roll.faceName}");
+            diceIndex++;
+
+            UpdateDiceUI();
+            yield return new WaitForSeconds(delay);
         }
-        UpdateDiceUI();
     }
 
-    public void UpdateDiceUI() //UI
+    // ------------------------- RESOLUTION -------------------------
+    public void ResolveActions()
+    {
+        foreach (var face in currentRolls)
+        {
+            if (face == null) continue;
+            face.ExecuteEffect(this, GameManager.Instance.player);
+        }
+        UpdateHealthUI();
+    }
+
+    public IEnumerator ResolveDiceCoroutine(float delay)
+    {
+        foreach (var face in currentRolls)
+        {
+            if (face == null) continue;
+            Debug.Log($"🎲 Enemy resolving face: {face.displayName}");
+            face.ExecuteEffect(this, GameManager.Instance.player);
+            UpdateHealthUI();
+            UpdateDiceUI();
+            yield return new WaitForSeconds(delay);
+        }
+    }
+
+    // ------------------------- UI -------------------------
+    public void ShowAllDiceFaces()
+    {
+        if (referencePanel == null || diceFaceSlotPrefab == null) return;
+
+        foreach (Transform child in referencePanel)
+            Destroy(child.gameObject);
+
+        foreach (var face in dice.faces)
+        {
+            GameObject slot = Instantiate(diceFaceSlotPrefab, referencePanel);
+            var image = slot.GetComponent<Image>();
+            if (image != null)
+                image.sprite = face.Image;
+        }
+    }
+
+    public bool HasRolledAllDice() => currentRolls.Count >= diceSlots.Length;
+
+    public void UpdateDiceUI()
     {
         for (int i = 0; i < diceSlots.Length; i++)
         {
             if (i < currentRolls.Count)
-                diceSlots[i].sprite = currentRolls[i].icon;
+                diceSlots[i].sprite = currentRolls[i].Image;
             else
                 diceSlots[i].sprite = null;
         }
     }
 
-    // Aplica los efectos de los dados
-    public void ResolveActions()
+    // ------------------------- START -------------------------
+    void Start()
     {
-        foreach (var face in currentRolls)
-        {
-            switch(face.effectType)
-            {
-                case DiceEffectType.Attack:
-                    GameManager.Instance.player.TakeDamage(face.power);
-                    break;
-                case DiceEffectType.Defense:
-                    Debug.Log("Enemy used Defense.");
-                    break;
-                // Agrega otros efectos si los dados los tienen
-            }
-        }
-    }
-
-    // Recibe daño
-    public void TakeDamage(int dmg)
-    {
-        health -= dmg;
-        health = Mathf.Max(health, 0); // nunca negativo
+        health = maxHealth;
         UpdateHealthUI();
-        Debug.Log($"Enemy takes {dmg}, HP = {health}");
+        ShowAllDiceFaces();
     }
 }

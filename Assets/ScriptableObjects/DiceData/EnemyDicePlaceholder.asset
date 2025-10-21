@@ -15,5 +15,5 @@ MonoBehaviour:
   faces:
   - {fileID: 11400000, guid: 282568aefc8c0a444871f2853faca3d3, type: 2}
   - {fileID: 11400000, guid: 282568aefc8c0a444871f2853faca3d3, type: 2}
-  - {fileID: 11400000, guid: 4413242c314e6e24f982ea19178fa80b, type: 2}
+  - {fileID: 11400000, guid: 282568aefc8c0a444871f2853faca3d3, type: 2}
   - {fileID: 11400000, guid: e0793425a11199f4093715ce3a985e5d, type: 2}

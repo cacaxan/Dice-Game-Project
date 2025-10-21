@@ -10,9 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e877cb159e59b1e42b1a8f2bb54feb01, type: 3}
-  m_Name: RerollFace
+  m_Name: 3_Null_Face
   m_EditorClassIdentifier: 
-  faceName: RerollFace
-  icon: {fileID: 21300000, guid: 479ec413248210f44a42196647bf24d9, type: 3}
-  effectType: 3
-  power: 0
+  ID: 3
+  displayName: None Effect
+  Description: Cara que no hace nada
+  Image: {fileID: 21300000, guid: c38c392777c7d4e4db6d7d8dfbab8a7d, type: 3}
+  Rarity: 0
+  Type: 6
+  PowerValue: 0
+  Params:
+    duration: 0
+    multiplier: 0
+    extraValue: 0
+  target: 0

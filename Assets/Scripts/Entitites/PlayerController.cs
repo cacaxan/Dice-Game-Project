@@ -1,119 +1,55 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 
-public class PlayerController : MonoBehaviour
+/// <summary>
+/// Controla al jugador: lanzamientos de dados manuales, rerolls, UI y resolución.
+/// Hereda de Character para stats y métodos básicos (health, defense, rerolls, etc.).
+/// </summary>
+public class PlayerController : Character
 {
-    public int health = 20;
-    public int maxHealth = 20;
-    public int rerolls = 0; // acumulables máximo 2
-    public int maxRerolls = 2;
-    public DiceData dice;
-    public DiceManager diceManager;
+    [Header("Dice Settings")]
+    public DiceData dice;                 // Dado del jugador
+    public DiceManager diceManager;       // Sistema de tiradas
 
-    public List<DiceFace> currentRolls = new List<DiceFace>();
-    private int diceIndex = 0; // índice del dado que estamos lanzando en este turno
+    [Header("Dice UI")]
+    public List<DiceFace> currentRolls = new List<DiceFace>(); // Caras lanzadas este turno
+    private int diceIndex = 0;           // Índice del dado que se está lanzando
+    public Image[] diceSlots;             // Slots visibles de dados
+    public TMP_Text rerollText;           // Texto de rerolls
+    public Button confirmButton;          // Botón de confirmar dado
+    public Button rerollButton;           // Botón de reroll
 
-    public Image[] diceSlots; // array de 3 slots
-    public TMP_Text rerollText;//UI num reRolls
-    public Button confirmButton;
-    public Button rerollButton;
+    [Header("Reference Panel")]
+    public Transform referencePanel;      // Panel para mostrar todas las caras posibles
+    public GameObject diceFaceSlotPrefab; // Prefab de slot de cara de dado
 
-    //Mostrar la Health (vida)
-    public Slider healthSlider;
-    public TMP_Text healthText;
-
-    //Para donde se muestran todas las caras posibles del dado:
-    public Transform referencePanel;      // Panel con GridLayoutGroup del jugador
-    public GameObject diceFaceSlotPrefab; // Prefab del slot de dado
-
-    //UI: Para mostrar todas las caras posibles del dado
-    public void ShowAllDiceFaces()
-    {
-        // Limpiar panel antes de mostrar
-        foreach(Transform child in referencePanel)
-            Destroy(child.gameObject);
-
-        // Crear un slot por cada cara del dado
-        foreach(var face in dice.faces)
-        {
-            GameObject slot = Instantiate(diceFaceSlotPrefab, referencePanel);
-            slot.GetComponent<Image>().sprite = face.icon;
-        }
-    }
-
-    //UI: mostrar la Health
-    public void UpdateHealthUI()
-    {
-        if (healthSlider != null)
-            healthSlider.value = Mathf.Clamp(health, 0, maxHealth); // ajusta valor actual
-
-        if (healthText != null)
-            healthText.text = $"HP: {Mathf.Max(health,0)}/{maxHealth}";
-    }
-
-    //Para que los botones no funcionen fuera de lturno del Player
-    public void SetButtonsInteractable(bool interactable)
-    {
-        if(confirmButton != null) confirmButton.interactable = interactable;
-        if(rerollButton != null) rerollButton.interactable = interactable;
-    }
-
-    public bool HasRolledAllDice()
-    {
-        return currentRolls.Count >= 3;
-    }
-
+    // ------------------------- TURN FLOW -------------------------
     public void StartTurn()
     {
-        rerolls = Mathf.Min(rerolls + 1, maxRerolls);
+        AddRerolls(1);                 // Incrementa rerolls disponibles
         currentRolls.Clear();
         diceIndex = 0;
-        UpdateRerollUI(); // actualizar al inicio del turno
+        UpdateRerollUI();
         RollNextDie();
-        SetButtonsInteractable(true); //Para que puedas usar los botones de UI
-    }
-
-    //UI num ReRolls
-    public void UpdateRerollUI()
-    {
-        if (rerollText != null)
-        {
-            int displayRerolls = Mathf.Min(rerolls, maxRerolls); // limitar al máximo
-            rerollText.text = $"Rerolls: {displayRerolls}/{maxRerolls}";
-        }
+        SetButtonsInteractable(true);
     }
 
     public void RollNextDie()
     {
-        if (diceIndex >= 3)
+        if (diceIndex >= diceSlots.Length)
         {
             Debug.Log("All dice rolled!");
-            SetButtonsInteractable(false); // desactiva botones al terminar
-            return; // TurnManager se encarga de esperar y resolver
+            SetButtonsInteractable(false);
+            return;
         }
 
         DiceFace roll = diceManager.Roll(dice);
         currentRolls.Add(roll);
-        Debug.Log($"Player rolled slot {diceIndex + 1}: {roll.faceName}");
+        Debug.Log($"Player rolled slot {diceIndex + 1}: {roll.displayName}");
         UpdateDiceUI();
-    }
-
-    public void UseReroll()
-    {
-        if (rerolls <= 0 || diceIndex >= currentRolls.Count)
-        {
-            Debug.Log("No Rerolls available or no die to reroll!");
-            return;
-        }
-
-        DiceFace newRoll = diceManager.Roll(dice);
-        currentRolls[diceIndex] = newRoll;
-        rerolls--;
-        Debug.Log($"Rerolled slot {diceIndex + 1}: {newRoll.faceName}");
-        UpdateDiceUI();
-        UpdateRerollUI(); // actualizar después de gastar un ReRoll
     }
 
     public void ConfirmDie()
@@ -122,67 +58,87 @@ public class PlayerController : MonoBehaviour
         RollNextDie();
     }
 
+    public void UseReroll()
+    {
+        if (rerolls <= 0 || diceIndex >= currentRolls.Count) return;
+
+        DiceFace newRoll = diceManager.Roll(dice);
+        currentRolls[diceIndex] = newRoll;
+        AddRerolls(-1); // gastar reroll
+        UpdateDiceUI();
+        UpdateRerollUI();
+    }
+
+    // ------------------------- RESOLUTION -------------------------
     public void ResolveActions()
     {
         foreach (var face in currentRolls)
         {
-            switch (face.effectType)
-            {
-                case DiceEffectType.Attack:
-                    GameManager.Instance.enemy.TakeDamage(face.power);
-                    break;
-                case DiceEffectType.Defense:
-                    Debug.Log("Player used Defense.");
-                    break;
-                case DiceEffectType.Reroll:
-                rerolls = Mathf.Min(rerolls + 1, maxRerolls); // nunca superar máximo
-                Debug.Log("Player gained a Reroll!");
-                UpdateRerollUI();
-                break;
-            }
+            if (face == null) continue;
+            face.ExecuteEffect(this, GameManager.Instance.enemy);
+        }
+        UpdateHealthUI();
+    }
+
+    public IEnumerator ResolveDiceCoroutine(float delay)
+    {
+        foreach (var face in currentRolls)
+        {
+            if (face == null) continue;
+            Debug.Log($"🎲 Player resolving face: {face.displayName}");
+            face.ExecuteEffect(this, GameManager.Instance.enemy);
+            UpdateHealthUI();
+            UpdateDiceUI();
+            yield return new WaitForSeconds(delay);
         }
     }
 
-    public void TakeDamage(int dmg)
+    // ------------------------- UI -------------------------
+    public void ShowAllDiceFaces()
     {
-        health -= dmg;
-        health = Mathf.Max(health, 0); // evitar negativos
-        UpdateHealthUI();
-        Debug.Log($"Player takes {dmg}, HP = {health}");
-        
+        if (referencePanel == null || diceFaceSlotPrefab == null) return;
+        foreach (Transform child in referencePanel)
+            Destroy(child.gameObject);
+
+        foreach (var face in dice.faces)
+        {
+            GameObject slot = Instantiate(diceFaceSlotPrefab, referencePanel);
+            var image = slot.GetComponent<Image>();
+            if (image != null)
+                image.sprite = face.Image;
+        }
     }
+
+    public void UpdateRerollUI()
+    {
+        if (rerollText != null)
+            rerollText.text = $"Rerolls: {Mathf.Min(rerolls, maxRerolls)}/{maxRerolls}";
+    }
+
+    public void SetButtonsInteractable(bool interactable)
+    {
+        if (confirmButton != null) confirmButton.interactable = interactable;
+        if (rerollButton != null) rerollButton.interactable = interactable;
+    }
+
+    public bool HasRolledAllDice() => currentRolls.Count >= diceSlots.Length;
 
     public void UpdateDiceUI()
     {
         for (int i = 0; i < diceSlots.Length; i++)
         {
             if (i < currentRolls.Count)
-                diceSlots[i].sprite = currentRolls[i].icon; // Icono del ScriptableObject DiceFace
+                diceSlots[i].sprite = currentRolls[i].Image;
             else
-                diceSlots[i].sprite = null; // Slot vacío
+                diceSlots[i].sprite = null;
         }
     }
 
+    // ------------------------- START -------------------------
     void Start()
     {
-        health = maxHealth; // valor inicial correcto
-        if (healthSlider != null)
-        {
-            healthSlider.maxValue = maxHealth; // actualizar máximo
-            healthSlider.value = health;       // barra llena al inicio
-        }
-        UpdateHealthUI(); // sincroniza también el texto
-        ShowAllDiceFaces(); // Muestra todas las caras del dado del jugador en el panel de referencia
-        
-    }
-
-    void Update()
-    {
-        // Para prototipo con teclado
-        if (Input.GetKeyDown(KeyCode.Space))
-            ConfirmDie();
-
-        if (Input.GetKeyDown(KeyCode.R))
-            UseReroll();
+        health = maxHealth;
+        UpdateHealthUI();
+        ShowAllDiceFaces();
     }
 }

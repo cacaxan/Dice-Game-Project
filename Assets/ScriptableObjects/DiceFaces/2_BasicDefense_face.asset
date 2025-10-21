@@ -10,9 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e877cb159e59b1e42b1a8f2bb54feb01, type: 3}
-  m_Name: NullFace
+  m_Name: 2_BasicDefense_face
   m_EditorClassIdentifier: 
-  faceName: NullFace
-  icon: {fileID: 21300000, guid: c38c392777c7d4e4db6d7d8dfbab8a7d, type: 3}
-  effectType: 2
-  power: 0
+  ID: 2
+  displayName: Basic Defense
+  Description: "Para un golpe de hasta 10 de da\xF1o"
+  Image: {fileID: 21300000, guid: eca6757fefa2f9f4fa268395052bd4ce, type: 3}
+  Rarity: 0
+  Type: 1
+  PowerValue: 10
+  Params:
+    duration: 0
+    multiplier: 0
+    extraValue: 0
+  target: 1
