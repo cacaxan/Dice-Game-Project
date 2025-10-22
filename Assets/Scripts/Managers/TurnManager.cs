@@ -47,6 +47,7 @@ public class TurnManager : MonoBehaviour
             state = BattleState.PlayerTurn;
             Debug.Log("Player Turn!");
             player.StartTurn();
+            Debug.Log($"Player starts turn with rerolls: {player.CurrentRerolls}/{player.MaxRerolls}");
             yield return new WaitUntil(() => player.HasRolledAllDice());
             yield return new WaitUntil(() => player.hasConfirmedAllDice);
             Debug.Log("Player confirmed all dice.");
