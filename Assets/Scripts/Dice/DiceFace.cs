@@ -26,6 +26,10 @@ public class DiceFace : ScriptableObject
 
         switch (Type)
         {
+            case DiceFaceType.Null:
+            Debug.Log($"{displayName} has no effect."); 
+            break;
+            
             case DiceFaceType.Attack:
                 if (targetChar != null)
                     targetChar.TakeDamage(PowerValue);
@@ -86,5 +90,5 @@ public struct EffectParams
 }
 
 public enum RarityType { Common, Rare, Epic, Legendary }
-public enum DiceFaceType { Attack, Defense, Heal, Reroll, Buff, Debuff, Utility }
+public enum DiceFaceType { Null, Attack, Defense, Heal, Reroll, Buff, Debuff, Utility }
 public enum FaceTarget { Enemy, Self }
