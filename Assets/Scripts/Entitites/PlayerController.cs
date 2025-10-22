@@ -4,32 +4,32 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// Controla al jugador: lanzamientos de dados manuales, rerolls, UI y resolución.
-/// Hereda de Character para stats y métodos básicos (health, defense, rerolls, etc.).
-/// </summary>
 public class PlayerController : Character
 {
     [Header("Dice Settings")]
-    public DiceData dice;                 // Dado del jugador
-    public DiceManager diceManager;       // Sistema de tiradas
+    public DiceData dice;                 
+    public DiceManager diceManager;       
 
     [Header("Dice UI")]
-    public List<DiceFace> currentRolls = new List<DiceFace>(); // Caras lanzadas este turno
-    private int diceIndex = 0;           // Índice del dado que se está lanzando
-    public Image[] diceSlots;             // Slots visibles de dados
-    public TMP_Text rerollText;           // Texto de rerolls
-    public Button confirmButton;          // Botón de confirmar dado
-    public Button rerollButton;           // Botón de reroll
+    public List<DiceFace> currentRolls = new List<DiceFace>(); 
+    private int diceIndex = 0;           
+    public Image[] diceSlots;             
+    public TMP_Text rerollText;           
+    public Button confirmButton;          
+    public Button rerollButton;           
 
     [Header("Reference Panel")]
-    public Transform referencePanel;      // Panel para mostrar todas las caras posibles
-    public GameObject diceFaceSlotPrefab; // Prefab de slot de cara de dado
+    public Transform referencePanel;      
+    public GameObject diceFaceSlotPrefab; 
+
+    // 🔹 NUEVO: Indica si el jugador ha confirmado el último dado
+    [HideInInspector] public bool hasConfirmedAllDice = false;
 
     // ------------------------- TURN FLOW -------------------------
     public void StartTurn()
     {
-        AddRerolls(1);                 // Incrementa rerolls disponibles
+        hasConfirmedAllDice = false; // 🔹 reset al iniciar turno
+        AddRerolls(1);
         currentRolls.Clear();
         diceIndex = 0;
         UpdateRerollUI();
@@ -52,10 +52,23 @@ public class PlayerController : Character
         UpdateDiceUI();
     }
 
+    // 🔹 CAMBIO AQUÍ
     public void ConfirmDie()
     {
         diceIndex++;
-        RollNextDie();
+
+        // Si aún hay dados por tirar → seguimos igual
+        if (diceIndex < diceSlots.Length)
+        {
+            RollNextDie();
+        }
+        else
+        {
+            // Si ya confirmó el último dado → desactivar botones y marcar como listo
+            Debug.Log("✅ Player confirmed all dice!");
+            SetButtonsInteractable(false);
+            hasConfirmedAllDice = true;
+        }
     }
 
     public void UseReroll()
@@ -64,7 +77,10 @@ public class PlayerController : Character
 
         DiceFace newRoll = diceManager.Roll(dice);
         currentRolls[diceIndex] = newRoll;
-        AddRerolls(-1); // gastar reroll
+
+        Debug.Log($"🔁 Player rerolled slot {diceIndex + 1}: {newRoll.displayName}");
+
+        AddRerolls(-1);
         UpdateDiceUI();
         UpdateRerollUI();
     }

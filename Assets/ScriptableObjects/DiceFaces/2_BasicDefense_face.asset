@@ -17,7 +17,7 @@ MonoBehaviour:
   Description: "Para un golpe de hasta 10 de da\xF1o"
   Image: {fileID: 21300000, guid: eca6757fefa2f9f4fa268395052bd4ce, type: 3}
   Rarity: 0
-  Type: 1
+  Type: 2
   PowerValue: 10
   Params:
     duration: 0

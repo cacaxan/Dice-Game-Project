@@ -17,7 +17,7 @@ MonoBehaviour:
   Description: "Hace 10 puntos de da\xF1oal enemigo"
   Image: {fileID: 21300000, guid: df3bd9adbe3e1ca429f94c970bcd5e79, type: 3}
   Rarity: 0
-  Type: 0
+  Type: 1
   PowerValue: 2
   Params:
     duration: 0
