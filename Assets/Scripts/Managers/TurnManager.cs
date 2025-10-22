@@ -9,6 +9,9 @@ public class TurnManager : MonoBehaviour
     public PlayerController player;
     public EnemyController enemy;
 
+    [Header("Managers")]
+    public ResultManager resultManager;   // 👈 Nueva referencia al ResultManager
+
     [Header("Timing")]
     public float resolveDelay = 0.5f;
 
@@ -80,9 +83,28 @@ public class TurnManager : MonoBehaviour
             Debug.Log($"Player HP: {player.CurrentHealth}/{player.MaxHealth} | Enemy HP: {enemy.CurrentHealth}/{enemy.MaxHealth}");
         }
 
+        // ----------- FIN DE BATALLA -----------
         state = BattleState.BattleEnded;
-        if (player.CurrentHealth <= 0) Debug.Log("Player Lost!");
-        else Debug.Log("Player Won!");
+
+        bool playerWon = player.CurrentHealth > 0;
+        if (playerWon)
+        {
+            Debug.Log("Player Won!");
+        }
+        else
+        {
+            Debug.Log("Player Lost!");
+        }
+
+        // 👇 Mostramos la pantalla de resultado
+        if (resultManager != null)
+        {
+            resultManager.ShowResult(playerWon);
+        }
+        else
+        {
+            Debug.LogWarning("ResultManager not assigned in TurnManager!");
+        }
     }
 
     // ------------------------- RESOLVE DEFENSES & HEALS -------------------------
@@ -113,4 +135,3 @@ public class TurnManager : MonoBehaviour
         }
     }
 }
-
