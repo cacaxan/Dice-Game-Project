@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &9174519792196117925
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2821528873791594762}
+  - component: {fileID: 2984958311068329345}
+  m_Layer: 0
+  m_Name: PlayerDefault
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2821528873791594762
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9174519792196117925}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2984958311068329345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9174519792196117925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 989f9d44fb283be49a2af6a2bc1e6782, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterData: {fileID: 11400000, guid: e3547705e7b80f642baf279dbfd9f843, type: 2}
+  health: 20
+  turnDefense: 0
+  rerolls: 0
+  currentRolls: []
+  healthBar: {fileID: 0}
+  healthText: {fileID: 0}
+  dice: {fileID: 11400000, guid: 6887147d7db4a1d4e8a6bb870d5bd1e8, type: 2}
+  diceManager: {fileID: 0}
+  diceSlots:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  rerollText: {fileID: 0}
+  confirmButton: {fileID: 0}
+  rerollButton: {fileID: 0}
+  referencePanel: {fileID: 0}
+  diceFaceSlotPrefab: {fileID: 105820208325987901, guid: 7f2b4854ddeaff9409218e053e4270d5, type: 3}
+  hasConfirmedAllDice: 0
