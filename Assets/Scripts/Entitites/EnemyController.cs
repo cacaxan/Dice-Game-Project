@@ -4,11 +4,12 @@ using System.Collections;
 
 /// <summary>
 /// Controla al enemigo: tiradas automáticas, UI y resolución.
+/// Toma stats y el dado directamente desde CharacterData.
 /// </summary>
 public class EnemyController : Character
 {
     [Header("Dice Manager")]
-    public DiceManager diceManager;
+    [SerializeField, HideInInspector] private DiceManager diceManager;
 
     [Header("Dice UI")]
     public Image[] diceSlots;
@@ -32,9 +33,15 @@ public class EnemyController : Character
         currentRolls.Clear();
         diceIndex = 0;
 
-        while (diceIndex < diceSlots.Length)
+        if (Dice == null)
         {
-            DiceFace roll = diceManager.Roll(dice);
+            Debug.LogError("❌ No DiceData assigned in CharacterData!");
+            yield break;
+        }
+
+        while (diceIndex < DicePerTurn)
+        {
+            DiceFace roll = diceManager.Roll(Dice);
             currentRolls.Add(roll);
             diceIndex++;
             UpdateDiceUI();
@@ -42,7 +49,7 @@ public class EnemyController : Character
         }
     }
 
-    public bool HasRolledAllDice() => currentRolls.Count >= diceSlots.Length;
+    public bool HasRolledAllDice() => currentRolls.Count >= DicePerTurn;
 
     // ------------------------- UI -------------------------
     public void UpdateDiceUI()
@@ -53,10 +60,10 @@ public class EnemyController : Character
 
     public void ShowAllDiceFaces()
     {
-        if (referencePanel == null || diceFaceSlotPrefab == null) return;
+        if (referencePanel == null || diceFaceSlotPrefab == null || Dice == null) return;
         foreach (Transform child in referencePanel) Destroy(child.gameObject);
 
-        foreach (var face in dice.faces)
+        foreach (var face in Dice.faces)
         {
             GameObject slot = Instantiate(diceFaceSlotPrefab, referencePanel);
             Image image = slot.GetComponent<Image>();
@@ -66,6 +73,10 @@ public class EnemyController : Character
 
     protected override void Start()
     {
+        // Asignar automáticamente el DiceManager usando la nueva API
+        if (diceManager == null)
+            diceManager = FindFirstObjectByType<DiceManager>();
+
         base.Start();
         ShowAllDiceFaces();
     }

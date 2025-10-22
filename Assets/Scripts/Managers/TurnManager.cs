@@ -20,6 +20,7 @@ public class TurnManager : MonoBehaviour
         player.ResetStats();
         enemy.ResetStats();
 
+        // Actualizamos UI
         player.UpdateHealthUI();
         enemy.UpdateHealthUI();
 
@@ -32,7 +33,7 @@ public class TurnManager : MonoBehaviour
     // ------------------------- MAIN LOOP -------------------------
     private IEnumerator BattleLoop()
     {
-        while (player.health > 0 && enemy.health > 0)
+        while (player.CurrentHealth > 0 && enemy.CurrentHealth > 0)
         {
             // ----------- ENEMY TURN -----------
             state = BattleState.EnemyTurn;
@@ -67,18 +68,19 @@ public class TurnManager : MonoBehaviour
             ResolveAttacksAndOtherEffects(enemy, player);
             yield return new WaitForSeconds(resolveDelay);
 
+            // Actualizamos UI
             player.UpdateHealthUI();
             enemy.UpdateHealthUI();
 
-            // Reiniciamos defensas temporales al final del turno
-            player.turnDefense = 0;
-            enemy.turnDefense = 0;
+            // Reiniciamos defensas temporales
+            player.ResetDefense();
+            enemy.ResetDefense();
 
-            Debug.Log($"Player HP: {player.health} | Enemy HP: {enemy.health}");
+            Debug.Log($"Player HP: {player.CurrentHealth}/{player.MaxHealth} | Enemy HP: {enemy.CurrentHealth}/{enemy.MaxHealth}");
         }
 
         state = BattleState.BattleEnded;
-        if (player.health <= 0) Debug.Log("Player Lost!");
+        if (player.CurrentHealth <= 0) Debug.Log("Player Lost!");
         else Debug.Log("Player Won!");
     }
 

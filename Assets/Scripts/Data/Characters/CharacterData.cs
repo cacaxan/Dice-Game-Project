@@ -13,6 +13,8 @@ public class CharacterData : ScriptableObject
     public int maxHealth = 20;            // Vida máxima
     public int baseDefense = 0;           // Defensa inicial
     public DiceData dice;                 // Dados que usa el personaje
+    public int maxRerolls = 2;            // Máximo de rerolls por turno
+    public int dicePerTurn = 3;           // Número de dados que tira por turno
     public RarityType rarity = RarityType.Common; // Rareza o nivel del personaje
 
     [Header("Visuals")]
@@ -27,21 +29,14 @@ public class CharacterData : ScriptableObject
 }
 
 // Extra enums y structs
-public enum RarityType
-{
-    Common,
-    Rare,
-    Epic,
-    Legendary
-}
+public enum RarityType { Common, Rare, Epic, Legendary }
 
-// Si quieres, AbilityData puede ser un ScriptableObject separado
 [System.Serializable]
 public class AbilityData
 {
     public string abilityName;
     [TextArea] public string description;
-    public DiceFaceType type; // Tipo de habilidad, por ejemplo Attack, Buff, etc.
+    public DiceFaceType type; // Tipo de habilidad: Attack, Buff, etc.
     public int powerValue;
     public EffectParams effectParams;
 }

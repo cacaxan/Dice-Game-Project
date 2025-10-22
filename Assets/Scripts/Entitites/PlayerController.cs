@@ -4,11 +4,12 @@ using TMPro;
 
 /// <summary>
 /// Controla al jugador: tiradas manuales, rerolls, confirmaciones y UI.
+/// Ahora utiliza CharacterData para todos los stats y el dado asignado.
 /// </summary>
 public class PlayerController : Character
 {
     [Header("Dice Manager")]
-    public DiceManager diceManager;
+    [SerializeField, HideInInspector] private DiceManager diceManager;
 
     [Header("Dice UI")]
     public Image[] diceSlots;
@@ -27,9 +28,12 @@ public class PlayerController : Character
     public void StartTurn()
     {
         hasConfirmedAllDice = false;
-        AddRerolls(1);
         currentRolls.Clear();
         diceIndex = 0;
+
+        // Dar 1 reroll al iniciar el turno, sin superar el máximo
+        AddRerolls(1);
+
         UpdateRerollUI();
         RollNextDie();
         SetButtonsInteractable(true);
@@ -37,13 +41,19 @@ public class PlayerController : Character
 
     public void RollNextDie()
     {
-        if (diceIndex >= diceSlots.Length)
+        if (diceIndex >= DicePerTurn)
         {
             SetButtonsInteractable(false);
             return;
         }
 
-        DiceFace roll = diceManager.Roll(dice);
+        if (Dice == null)
+        {
+            Debug.LogError("❌ No DiceData assigned in CharacterData!");
+            return;
+        }
+
+        DiceFace roll = diceManager.Roll(Dice);
         currentRolls.Add(roll);
         Debug.Log($"Player rolled slot {diceIndex + 1}: {roll.displayName}");
         UpdateDiceUI();
@@ -52,7 +62,7 @@ public class PlayerController : Character
     public void ConfirmDie()
     {
         diceIndex++;
-        if (diceIndex < diceSlots.Length)
+        if (diceIndex < DicePerTurn)
             RollNextDie();
         else
         {
@@ -64,9 +74,9 @@ public class PlayerController : Character
 
     public void UseReroll()
     {
-        if (rerolls <= 0 || diceIndex >= currentRolls.Count) return;
+        if (CurrentRerolls <= 0 || diceIndex >= currentRolls.Count) return;
 
-        DiceFace newRoll = diceManager.Roll(dice);
+        DiceFace newRoll = diceManager.Roll(Dice);
         currentRolls[diceIndex] = newRoll;
         Debug.Log($"🔁 Player rerolled slot {diceIndex + 1}: {newRoll.displayName}");
 
@@ -75,7 +85,7 @@ public class PlayerController : Character
         UpdateRerollUI();
     }
 
-    public bool HasRolledAllDice() => currentRolls.Count >= diceSlots.Length;
+    public bool HasRolledAllDice() => currentRolls.Count >= DicePerTurn;
 
     // ------------------------- UI -------------------------
     public void UpdateDiceUI()
@@ -86,10 +96,10 @@ public class PlayerController : Character
 
     public void ShowAllDiceFaces()
     {
-        if (referencePanel == null || diceFaceSlotPrefab == null) return;
+        if (referencePanel == null || diceFaceSlotPrefab == null || Dice == null) return;
         foreach (Transform child in referencePanel) Destroy(child.gameObject);
 
-        foreach (var face in dice.faces)
+        foreach (var face in Dice.faces)
         {
             GameObject slot = Instantiate(diceFaceSlotPrefab, referencePanel);
             Image image = slot.GetComponent<Image>();
@@ -100,7 +110,7 @@ public class PlayerController : Character
     public void UpdateRerollUI()
     {
         if (rerollText != null)
-            rerollText.text = $"Rerolls: {Mathf.Min(rerolls, maxRerolls)}/{maxRerolls}";
+            rerollText.text = $"Rerolls: {Mathf.Min(CurrentRerolls, MaxRerolls)}/{MaxRerolls}";
     }
 
     public void SetButtonsInteractable(bool interactable)
@@ -111,6 +121,10 @@ public class PlayerController : Character
 
     protected override void Start()
     {
+        // Asignar automáticamente el DiceManager usando la nueva API
+        if (diceManager == null)
+            diceManager = FindFirstObjectByType<DiceManager>();
+
         base.Start();
         ShowAllDiceFaces();
     }

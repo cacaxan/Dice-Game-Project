@@ -17,7 +17,9 @@ MonoBehaviour:
   description: 
   maxHealth: 20
   baseDefense: 0
-  dice: {fileID: 11400000, guid: d09a645192bb90842a6748c77bf88e43, type: 2}
+  dice: {fileID: 11400000, guid: 6887147d7db4a1d4e8a6bb870d5bd1e8, type: 2}
+  maxRerolls: 2
+  dicePerTurn: 3
   rarity: 0
   characterSprite: {fileID: 0}
   prefab: {fileID: 0}
