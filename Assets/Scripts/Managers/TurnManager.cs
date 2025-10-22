@@ -31,7 +31,6 @@ public class TurnManager : MonoBehaviour
             // ----------- ENEMY TURN -----------
             state = BattleState.EnemyTurn;
             Debug.Log("Enemy Turn!");
-
             yield return StartCoroutine(enemy.RollAllDiceCoroutine(0.3f));
             enemy.UpdateDiceUI();
             enemy.UpdateHealthUI();
@@ -41,11 +40,7 @@ public class TurnManager : MonoBehaviour
             Debug.Log("Player Turn!");
             player.StartTurn();
 
-            // Esperar a que haya lanzado los tres dados
             yield return new WaitUntil(() => player.HasRolledAllDice());
-            Debug.Log("Player rolled all dice.");
-
-            // 🔹 Esperar a que confirme manualmente el último dado
             yield return new WaitUntil(() => player.hasConfirmedAllDice);
             Debug.Log("Player confirmed all dice.");
 
@@ -56,18 +51,52 @@ public class TurnManager : MonoBehaviour
             state = BattleState.Resolving;
             Debug.Log("Resolving Turn...");
 
-            yield return StartCoroutine(player.ResolveDiceCoroutine(resolveDelay));
-            yield return StartCoroutine(enemy.ResolveDiceCoroutine(resolveDelay));
+            // 🔹 Resolver defensas y curas primero
+            ResolveDefensesAndHeals(player);
+            ResolveDefensesAndHeals(enemy);
+
+            // 🔹 Resolver ataques y otros efectos
+            ResolveAttacksAndOtherEffects(player, enemy);
+            ResolveAttacksAndOtherEffects(enemy, player);
 
             player.UpdateHealthUI();
             enemy.UpdateHealthUI();
 
+            // 🔹 Reiniciamos defensas temporales al final del turno
+            player.turnDefense = 0;
+            enemy.turnDefense = 0;
+
             Debug.Log($"Player HP: {player.health} | Enemy HP: {enemy.health}");
         }
 
-        // ----------- END -----------
         state = BattleState.BattleEnded;
         if (player.health <= 0) Debug.Log("Player Lost!");
         else Debug.Log("Player Won!");
+    }
+
+    private void ResolveDefensesAndHeals(Character character)
+    {
+        foreach (var face in character.currentRolls)
+        {
+            if (face == null) continue;
+
+            if (face.Type == DiceFaceType.Defense || face.Type == DiceFaceType.Heal)
+            {
+                face.ExecuteEffect(character, null);
+            }
+        }
+    }
+
+    private void ResolveAttacksAndOtherEffects(Character user, Character target)
+    {
+        foreach (var face in user.currentRolls)
+        {
+            if (face == null) continue;
+
+            if (face.Type != DiceFaceType.Defense && face.Type != DiceFaceType.Heal)
+            {
+                face.ExecuteEffect(user, target);
+            }
+        }
     }
 }

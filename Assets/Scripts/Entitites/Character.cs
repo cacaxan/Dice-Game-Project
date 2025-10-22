@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
 
 public class Character : MonoBehaviour
 {
@@ -14,20 +15,22 @@ public class Character : MonoBehaviour
     public Slider healthBar;
     public TMP_Text healthText;
 
-    [Header("Rerolls (only for player, optional)")]
+    [Header("Rerolls (only for player)")]
     public int rerolls;
     public int maxRerolls = 2;
 
-    // ✅ Métodos básicos que el sistema de caras de dados espera:
+    // 🔹 Defensa temporal y dados de este turno
+    [HideInInspector] public List<DiceFace> currentRolls = new List<DiceFace>();
+    [HideInInspector] public int turnDefense = 0;
 
     public virtual void TakeDamage(int amount, Character source = null)
     {
-        int effectiveDamage = Mathf.Max(amount - defense, 0); // aplicamos defensa
-        defense = Mathf.Max(defense - amount, 0);            // reducimos defensa si se usa
-        health = Mathf.Max(health - effectiveDamage, 0);     // nunca negativos
+        int effectiveDamage = Mathf.Max(amount - turnDefense, 0);
+        turnDefense = Mathf.Max(turnDefense - amount, 0);
+        health = Mathf.Max(health - effectiveDamage, 0);
 
         Debug.Log($"{characterName} took {effectiveDamage} damage. HP: {health}/{maxHealth}");
-        UpdateHealthUI(); // sincroniza barra y texto
+        UpdateHealthUI();
     }
 
     public virtual void Heal(int amount)
@@ -39,8 +42,8 @@ public class Character : MonoBehaviour
 
     public virtual void GainDefense(int amount)
     {
-        defense += amount;
-        Debug.Log($"{characterName} gained {amount} defense (total {defense}).");
+        turnDefense += amount;
+        Debug.Log($"{characterName} gained {amount} defense (turnDefense {turnDefense}).");
     }
 
     public virtual void AddRerolls(int amount)
@@ -61,7 +64,6 @@ public class Character : MonoBehaviour
         Debug.Log($"{characterName} got debuffed! Duration {p.duration}, Mult {p.multiplier}");
     }
 
-    // 🔹 Actualiza la UI
     public void UpdateHealthUI()
     {
         if (healthText != null)
@@ -75,7 +77,9 @@ public class Character : MonoBehaviour
     {
         health = maxHealth;
         defense = 0;
+        turnDefense = 0;
         rerolls = 0;
+        currentRolls.Clear();
         UpdateHealthUI();
     }
 }

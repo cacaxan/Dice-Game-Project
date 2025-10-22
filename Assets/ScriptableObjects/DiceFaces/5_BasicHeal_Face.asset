@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 5
   displayName: Basic Heal
-  Description: Cura 10 puntos de vida
+  Description: Cura 4 puntos de vida
   Image: {fileID: 21300000, guid: ed1aee4bea7f2e848869d11f0992bb62, type: 3}
   Rarity: 0
   Type: 3

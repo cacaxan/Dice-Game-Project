@@ -4,62 +4,54 @@ using UnityEngine;
 public class DiceFace : ScriptableObject
 {
     [Header("General Info")]
-    public string ID;                          // identificador único
-    public string displayName;                 // nombre visible
-    [TextArea] public string Description;      // descripción del efecto
-    public Sprite Image;                       // icono
-    public RarityType Rarity;                  // rareza
-    public DiceFaceType Type;                  // tipo de cara
+    public string ID;                          
+    public string displayName;                 
+    [TextArea] public string Description;      
+    public Sprite Image;                       
+    public RarityType Rarity;                  
+    public DiceFaceType Type;                  
 
     [Header("Gameplay Properties")]
-    public int PowerValue;                     // valor principal (daño, defensa, curación...)
-    public EffectParams Params;                // parámetros extra opcionales
+    public int PowerValue;                     
+    public EffectParams Params;                
 
     [Header("Targeting")]
-    public FaceTarget target = FaceTarget.Enemy; // quién recibe el efecto por defecto
+    public FaceTarget target = FaceTarget.Enemy; 
 
-    // 🔹 Ejecutado por TurnManager al resolver el dado
+    // 🔹 Ejecutado al resolver el dado
     public void ExecuteEffect(Character user, Character opponent)
     {
-        // determinamos objetivo real
         Character targetChar = (target == FaceTarget.Self) ? user : opponent;
 
         switch (Type)
         {
             case DiceFaceType.Null:
-            Debug.Log($"{displayName} has no effect."); 
-            break;
-            
+                Debug.Log($"{displayName} has no effect."); 
+                break;
             case DiceFaceType.Attack:
                 if (targetChar != null)
                     targetChar.TakeDamage(PowerValue);
                 break;
-
             case DiceFaceType.Defense:
                 if (user != null)
                     user.GainDefense(PowerValue);
                 break;
-
             case DiceFaceType.Heal:
                 if (targetChar != null)
                     targetChar.Heal(PowerValue);
                 break;
-
             case DiceFaceType.Reroll:
                 if (user != null)
                     user.AddRerolls(PowerValue);
                 break;
-
             case DiceFaceType.Buff:
                 if (targetChar != null)
                     targetChar.ApplyBuff(Params);
                 break;
-
             case DiceFaceType.Debuff:
                 if (targetChar != null)
                     targetChar.ApplyDebuff(Params);
                 break;
-
             case DiceFaceType.Utility:
                 HandleUtility(user, targetChar);
                 break;
@@ -68,7 +60,6 @@ public class DiceFace : ScriptableObject
 
     void HandleUtility(Character user, Character targetChar)
     {
-        // ejemplo genérico de efecto especial
         if (ID == "steal_reroll")
         {
             if (targetChar != null)

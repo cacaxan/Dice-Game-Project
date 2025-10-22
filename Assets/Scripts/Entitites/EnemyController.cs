@@ -6,7 +6,6 @@ using TMPro;
 
 /// <summary>
 /// Controla al enemigo: lanzamiento automático de dados, resolución de efectos y UI.
-/// Hereda de Character.
 /// </summary>
 public class EnemyController : Character
 {
@@ -15,23 +14,21 @@ public class EnemyController : Character
     public DiceManager diceManager;
 
     [Header("Dice UI")]
-    public List<DiceFace> currentRolls = new List<DiceFace>();
-    private int diceIndex = 0;
     public Image[] diceSlots;
 
     [Header("Reference Panel")]
     public Transform referencePanel;
     public GameObject diceFaceSlotPrefab;
 
-    // ------------------------- TURN FLOW -------------------------
+    private int diceIndex = 0;
+
     public void StartTurn()
     {
         currentRolls.Clear();
         diceIndex = 0;
-        StartCoroutine(RollAllDiceCoroutine(0.3f)); // animación automática
+        StartCoroutine(RollAllDiceCoroutine(0.3f));
     }
 
-    // Lanza todos los dados con delay para que se vea en UI
     public IEnumerator RollAllDiceCoroutine(float delay = 0.3f)
     {
         currentRolls.Clear();
@@ -48,31 +45,19 @@ public class EnemyController : Character
         }
     }
 
-    // ------------------------- RESOLUTION -------------------------
-    public void ResolveActions()
-    {
-        foreach (var face in currentRolls)
-        {
-            if (face == null) continue;
-            face.ExecuteEffect(this, GameManager.Instance.player);
-        }
-        UpdateHealthUI();
-    }
+    public bool HasRolledAllDice() => currentRolls.Count >= diceSlots.Length;
 
-    public IEnumerator ResolveDiceCoroutine(float delay)
+    public void UpdateDiceUI()
     {
-        foreach (var face in currentRolls)
+        for (int i = 0; i < diceSlots.Length; i++)
         {
-            if (face == null) continue;
-            Debug.Log($"🎲 Enemy resolving face: {face.displayName}");
-            face.ExecuteEffect(this, GameManager.Instance.player);
-            UpdateHealthUI();
-            UpdateDiceUI();
-            yield return new WaitForSeconds(delay);
+            if (i < currentRolls.Count)
+                diceSlots[i].sprite = currentRolls[i].Image;
+            else
+                diceSlots[i].sprite = null;
         }
     }
 
-    // ------------------------- UI -------------------------
     public void ShowAllDiceFaces()
     {
         if (referencePanel == null || diceFaceSlotPrefab == null) return;
@@ -89,20 +74,6 @@ public class EnemyController : Character
         }
     }
 
-    public bool HasRolledAllDice() => currentRolls.Count >= diceSlots.Length;
-
-    public void UpdateDiceUI()
-    {
-        for (int i = 0; i < diceSlots.Length; i++)
-        {
-            if (i < currentRolls.Count)
-                diceSlots[i].sprite = currentRolls[i].Image;
-            else
-                diceSlots[i].sprite = null;
-        }
-    }
-
-    // ------------------------- START -------------------------
     void Start()
     {
         health = maxHealth;

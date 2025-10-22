@@ -4,31 +4,34 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// Controla al jugador: tiradas manuales, rerolls, confirmaciones, UI y resolución de efectos.
+/// </summary>
 public class PlayerController : Character
 {
     [Header("Dice Settings")]
-    public DiceData dice;                 
-    public DiceManager diceManager;       
+    public DiceData dice;
+    public DiceManager diceManager;
 
     [Header("Dice UI")]
-    public List<DiceFace> currentRolls = new List<DiceFace>(); 
-    private int diceIndex = 0;           
-    public Image[] diceSlots;             
-    public TMP_Text rerollText;           
-    public Button confirmButton;          
-    public Button rerollButton;           
+    public Image[] diceSlots;
+    public TMP_Text rerollText;
+    public Button confirmButton;
+    public Button rerollButton;
 
     [Header("Reference Panel")]
-    public Transform referencePanel;      
-    public GameObject diceFaceSlotPrefab; 
+    public Transform referencePanel;
+    public GameObject diceFaceSlotPrefab;
 
-    // 🔹 NUEVO: Indica si el jugador ha confirmado el último dado
-    [HideInInspector] public bool hasConfirmedAllDice = false;
+    // 🔹 Estado interno de tiradas
+    private int diceIndex = 0;
 
-    // ------------------------- TURN FLOW -------------------------
+    [HideInInspector]
+    public bool hasConfirmedAllDice = false;
+
     public void StartTurn()
     {
-        hasConfirmedAllDice = false; // 🔹 reset al iniciar turno
+        hasConfirmedAllDice = false;
         AddRerolls(1);
         currentRolls.Clear();
         diceIndex = 0;
@@ -52,19 +55,16 @@ public class PlayerController : Character
         UpdateDiceUI();
     }
 
-    // 🔹 CAMBIO AQUÍ
     public void ConfirmDie()
     {
         diceIndex++;
 
-        // Si aún hay dados por tirar → seguimos igual
         if (diceIndex < diceSlots.Length)
         {
             RollNextDie();
         }
         else
         {
-            // Si ya confirmó el último dado → desactivar botones y marcar como listo
             Debug.Log("✅ Player confirmed all dice!");
             SetButtonsInteractable(false);
             hasConfirmedAllDice = true;
@@ -85,34 +85,23 @@ public class PlayerController : Character
         UpdateRerollUI();
     }
 
-    // ------------------------- RESOLUTION -------------------------
-    public void ResolveActions()
-    {
-        foreach (var face in currentRolls)
-        {
-            if (face == null) continue;
-            face.ExecuteEffect(this, GameManager.Instance.enemy);
-        }
-        UpdateHealthUI();
-    }
+    public bool HasRolledAllDice() => currentRolls.Count >= diceSlots.Length;
 
-    public IEnumerator ResolveDiceCoroutine(float delay)
+    public void UpdateDiceUI()
     {
-        foreach (var face in currentRolls)
+        for (int i = 0; i < diceSlots.Length; i++)
         {
-            if (face == null) continue;
-            Debug.Log($"🎲 Player resolving face: {face.displayName}");
-            face.ExecuteEffect(this, GameManager.Instance.enemy);
-            UpdateHealthUI();
-            UpdateDiceUI();
-            yield return new WaitForSeconds(delay);
+            if (i < currentRolls.Count)
+                diceSlots[i].sprite = currentRolls[i].Image;
+            else
+                diceSlots[i].sprite = null;
         }
     }
 
-    // ------------------------- UI -------------------------
     public void ShowAllDiceFaces()
     {
         if (referencePanel == null || diceFaceSlotPrefab == null) return;
+
         foreach (Transform child in referencePanel)
             Destroy(child.gameObject);
 
@@ -137,20 +126,6 @@ public class PlayerController : Character
         if (rerollButton != null) rerollButton.interactable = interactable;
     }
 
-    public bool HasRolledAllDice() => currentRolls.Count >= diceSlots.Length;
-
-    public void UpdateDiceUI()
-    {
-        for (int i = 0; i < diceSlots.Length; i++)
-        {
-            if (i < currentRolls.Count)
-                diceSlots[i].sprite = currentRolls[i].Image;
-            else
-                diceSlots[i].sprite = null;
-        }
-    }
-
-    // ------------------------- START -------------------------
     void Start()
     {
         health = maxHealth;
