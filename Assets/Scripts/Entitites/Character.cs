@@ -2,15 +2,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using System.Collections;
 
 /// <summary>
 /// Clase base de todos los personajes (Player y Enemy).
 /// Todos los stats y el dado se leen desde CharacterData.
+/// Maneja la lógica de turnos y tiradas común.
 /// </summary>
-public class Character : MonoBehaviour
+public abstract class Character : MonoBehaviour
 {
     [Header("Character Data (ScriptableObject)")]
-    [Tooltip("Asignar el ScriptableObject que define stats y dados")]
     public CharacterData characterData;
 
     // ------------------------- PROPIEDADES -------------------------
@@ -31,13 +32,11 @@ public class Character : MonoBehaviour
     public Slider healthBar;
     public TMP_Text healthText;
 
-    // ------------------------- DADO ASIGNADO DESDE CHARACTER DATA -------------------------
     [HideInInspector] public DiceData dice;
-
-    /// <summary>
-    /// Propiedad pública de solo lectura para acceder al dado.
-    /// </summary>
     public DiceData Dice => dice;
+
+    [Header("Dice Manager")]
+    [SerializeField, HideInInspector] protected DiceManager diceManager;
 
     // ------------------------- INICIALIZACIÓN -------------------------
     public virtual void InitializeCharacter()
@@ -46,7 +45,7 @@ public class Character : MonoBehaviour
         {
             health = MaxHealth;
             turnDefense = 0;
-            rerolls = 0;
+            rerolls = 0; // ahora inicia en 0
             dice = characterData.dice;
         }
 
@@ -54,7 +53,15 @@ public class Character : MonoBehaviour
         UpdateHealthUI();
     }
 
-    // ------------------------- MÉTODOS -------------------------
+    protected virtual void Start()
+    {
+        if (diceManager == null)
+            diceManager = FindFirstObjectByType<DiceManager>();
+
+        InitializeCharacter();
+    }
+
+    // ------------------------- MÉTODOS COMUNES -------------------------
     public virtual void TakeDamage(int amount, Character source = null)
     {
         int effectiveDamage = Mathf.Max(amount - turnDefense, 0);
@@ -85,11 +92,7 @@ public class Character : MonoBehaviour
     }
 
     public int GetRerolls() => rerolls;
-
-    public void SetRerolls(int value)
-    {
-        rerolls = Mathf.Clamp(value, 0, MaxRerolls);
-    }
+    public void SetRerolls(int value) => rerolls = Mathf.Clamp(value, 0, MaxRerolls);
 
     public virtual void ApplyBuff(EffectParams p)
     {
@@ -101,36 +104,26 @@ public class Character : MonoBehaviour
         Debug.Log($"{CharacterName} got debuffed! Duration {p.duration}, Mult {p.multiplier}");
     }
 
-    // ------------------------- RESET DEFENSE -------------------------
-    public void ResetDefense()
-    {
-        turnDefense = 0;
-    }
+    public void ResetDefense() => turnDefense = 0;
 
-    // ------------------------- UI -------------------------
     public void UpdateHealthUI()
     {
         if (healthText != null)
             healthText.text = $"HP: {health}/{MaxHealth}";
-
         if (healthBar != null)
             healthBar.value = (float)health / MaxHealth;
     }
 
-    // ------------------------- RESET -------------------------
-    public void ResetStats()
-    {
-        InitializeCharacter();
-    }
+    public void ResetStats() => InitializeCharacter();
 
-    protected virtual void Start()
-    {
-        InitializeCharacter();
-    }
-
-    // ------------------------- PROPIEDADES DE SOLO LECTURA -------------------------
+    // ------------------------- PROPIEDADES -------------------------
     public int CurrentHealth => health;
     public int TurnDefense => turnDefense;
     public int CurrentRerolls => rerolls;
-}
 
+    // ------------------------- MÉTODOS DE TURNOS COMUNES -------------------------
+    public abstract void StartTurn();
+    public abstract bool HasRolledAllDice();
+    public abstract void UpdateDiceUI();
+    public abstract void ShowAllDiceFaces();
+}

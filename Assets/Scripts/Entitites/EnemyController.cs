@@ -3,14 +3,10 @@ using UnityEngine.UI;
 using System.Collections;
 
 /// <summary>
-/// Controla al enemigo: tiradas automáticas, UI y resolución.
-/// Toma stats y el dado directamente desde CharacterData.
+/// Controla al enemigo: tiradas automáticas y UI.
 /// </summary>
 public class EnemyController : Character
 {
-    [Header("Dice Manager")]
-    [SerializeField, HideInInspector] private DiceManager diceManager;
-
     [Header("Dice UI")]
     public Image[] diceSlots;
 
@@ -20,8 +16,7 @@ public class EnemyController : Character
 
     private int diceIndex = 0;
 
-    // ------------------------- TURN FLOW -------------------------
-    public void StartTurn()
+    public override void StartTurn()
     {
         currentRolls.Clear();
         diceIndex = 0;
@@ -49,16 +44,16 @@ public class EnemyController : Character
         }
     }
 
-    public bool HasRolledAllDice() => currentRolls.Count >= DicePerTurn;
+    public override bool HasRolledAllDice() => currentRolls.Count >= DicePerTurn;
 
     // ------------------------- UI -------------------------
-    public void UpdateDiceUI()
+    public override void UpdateDiceUI()
     {
         for (int i = 0; i < diceSlots.Length; i++)
             diceSlots[i].sprite = i < currentRolls.Count ? currentRolls[i].Image : null;
     }
 
-    public void ShowAllDiceFaces()
+    public override void ShowAllDiceFaces()
     {
         if (referencePanel == null || diceFaceSlotPrefab == null || Dice == null) return;
         foreach (Transform child in referencePanel) Destroy(child.gameObject);
@@ -73,10 +68,6 @@ public class EnemyController : Character
 
     protected override void Start()
     {
-        // Asignar automáticamente el DiceManager usando la nueva API
-        if (diceManager == null)
-            diceManager = FindFirstObjectByType<DiceManager>();
-
         base.Start();
         ShowAllDiceFaces();
     }

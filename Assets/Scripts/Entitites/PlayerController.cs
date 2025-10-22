@@ -4,13 +4,9 @@ using TMPro;
 
 /// <summary>
 /// Controla al jugador: tiradas manuales, rerolls, confirmaciones y UI.
-/// Ahora utiliza CharacterData para todos los stats y el dado asignado.
 /// </summary>
 public class PlayerController : Character
 {
-    [Header("Dice Manager")]
-    [SerializeField, HideInInspector] private DiceManager diceManager;
-
     [Header("Dice UI")]
     public Image[] diceSlots;
     public TMP_Text rerollText;
@@ -24,17 +20,15 @@ public class PlayerController : Character
     private int diceIndex = 0;
     [HideInInspector] public bool hasConfirmedAllDice = false;
 
-    // ------------------------- TURN FLOW -------------------------
-    public void StartTurn()
+    public override void StartTurn()
     {
         hasConfirmedAllDice = false;
         currentRolls.Clear();
         diceIndex = 0;
 
-        // Dar 1 reroll al iniciar el turno, sin superar el máximo
-        AddRerolls(1);
-
+        AddRerolls(1); // gana 1 reroll al inicio
         UpdateRerollUI();
+
         RollNextDie();
         SetButtonsInteractable(true);
     }
@@ -85,16 +79,16 @@ public class PlayerController : Character
         UpdateRerollUI();
     }
 
-    public bool HasRolledAllDice() => currentRolls.Count >= DicePerTurn;
+    public override bool HasRolledAllDice() => currentRolls.Count >= DicePerTurn;
 
     // ------------------------- UI -------------------------
-    public void UpdateDiceUI()
+    public override void UpdateDiceUI()
     {
         for (int i = 0; i < diceSlots.Length; i++)
             diceSlots[i].sprite = i < currentRolls.Count ? currentRolls[i].Image : null;
     }
 
-    public void ShowAllDiceFaces()
+    public override void ShowAllDiceFaces()
     {
         if (referencePanel == null || diceFaceSlotPrefab == null || Dice == null) return;
         foreach (Transform child in referencePanel) Destroy(child.gameObject);
@@ -121,10 +115,6 @@ public class PlayerController : Character
 
     protected override void Start()
     {
-        // Asignar automáticamente el DiceManager usando la nueva API
-        if (diceManager == null)
-            diceManager = FindFirstObjectByType<DiceManager>();
-
         base.Start();
         ShowAllDiceFaces();
     }
