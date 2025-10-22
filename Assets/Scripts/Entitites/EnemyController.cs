@@ -14,6 +14,8 @@ public class EnemyController : Character
     public Transform referencePanel;
     public GameObject diceFaceSlotPrefab;
 
+  
+
     private int diceIndex = 0;
 
     public override void StartTurn()

@@ -62,4 +62,5 @@ MonoBehaviour:
   rerollButton: {fileID: 0}
   referencePanel: {fileID: 0}
   diceFaceSlotPrefab: {fileID: 105820208325987901, guid: 7f2b4854ddeaff9409218e053e4270d5, type: 3}
+  CharacterImage: {fileID: 0}
   hasConfirmedAllDice: 0

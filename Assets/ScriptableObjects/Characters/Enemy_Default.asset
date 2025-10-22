@@ -18,8 +18,10 @@ MonoBehaviour:
   maxHealth: 16
   baseDefense: 0
   dice: {fileID: 11400000, guid: d09a645192bb90842a6748c77bf88e43, type: 2}
+  maxRerolls: 2
+  dicePerTurn: 3
   rarity: 0
-  characterSprite: {fileID: 0}
+  characterSprite: {fileID: 21300000, guid: ed1aee4bea7f2e848869d11f0992bb62, type: 3}
   prefab: {fileID: 0}
   goldReward: 5
   expReward: 0

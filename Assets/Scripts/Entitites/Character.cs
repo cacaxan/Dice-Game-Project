@@ -32,6 +32,9 @@ public abstract class Character : MonoBehaviour
     public Slider healthBar;
     public TMP_Text healthText;
 
+    [Header("Visuals")]
+    public Image CharacterImage; // solo en la clase base
+
     [HideInInspector] public DiceData dice;
     public DiceData Dice => dice;
 
@@ -45,13 +48,19 @@ public abstract class Character : MonoBehaviour
         {
             health = MaxHealth;
             turnDefense = 0;
-            rerolls = 0; // ahora inicia en 0
+            rerolls = 0;
             dice = characterData.dice;
+
+            // 🖼️ Asignar el sprite del personaje al Image de UI
+            if (CharacterImage != null && characterData.characterSprite != null)
+            {
+                CharacterImage.sprite = characterData.characterSprite;
+            }
         }
 
         currentRolls.Clear();
         UpdateHealthUI();
-    }
+    }  
 
     protected virtual void Start()
     {

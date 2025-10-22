@@ -17,6 +17,8 @@ public class PlayerController : Character
     public Transform referencePanel;
     public GameObject diceFaceSlotPrefab;
 
+
+
     private int diceIndex = 0;
     [HideInInspector] public bool hasConfirmedAllDice = false;
 
