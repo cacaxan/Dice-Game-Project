@@ -5,11 +5,16 @@ public enum BattleState { EnemyTurn, PlayerTurn, Resolving, BattleEnded }
 
 public class TurnManager : MonoBehaviour
 {
-    public BattleState state;
+    [Header("Battle Participants")]
     public PlayerController player;
     public EnemyController enemy;
+
+    [Header("Timing")]
     public float resolveDelay = 0.5f;
 
+    public BattleState state;
+
+    // ------------------------- START BATTLE -------------------------
     public void StartBattle()
     {
         player.ResetStats();
@@ -24,6 +29,7 @@ public class TurnManager : MonoBehaviour
         StartCoroutine(BattleLoop());
     }
 
+    // ------------------------- MAIN LOOP -------------------------
     private IEnumerator BattleLoop()
     {
         while (player.health > 0 && enemy.health > 0)
@@ -31,7 +37,8 @@ public class TurnManager : MonoBehaviour
             // ----------- ENEMY TURN -----------
             state = BattleState.EnemyTurn;
             Debug.Log("Enemy Turn!");
-            yield return StartCoroutine(enemy.RollAllDiceCoroutine(0.3f));
+            enemy.StartTurn();
+            yield return new WaitUntil(() => enemy.HasRolledAllDice());
             enemy.UpdateDiceUI();
             enemy.UpdateHealthUI();
 
@@ -39,7 +46,6 @@ public class TurnManager : MonoBehaviour
             state = BattleState.PlayerTurn;
             Debug.Log("Player Turn!");
             player.StartTurn();
-
             yield return new WaitUntil(() => player.HasRolledAllDice());
             yield return new WaitUntil(() => player.hasConfirmedAllDice);
             Debug.Log("Player confirmed all dice.");
@@ -51,18 +57,20 @@ public class TurnManager : MonoBehaviour
             state = BattleState.Resolving;
             Debug.Log("Resolving Turn...");
 
-            // 🔹 Resolver defensas y curas primero
+            // Resolver defensas y curas primero
             ResolveDefensesAndHeals(player);
             ResolveDefensesAndHeals(enemy);
+            yield return new WaitForSeconds(resolveDelay);
 
-            // 🔹 Resolver ataques y otros efectos
+            // Resolver ataques y otros efectos
             ResolveAttacksAndOtherEffects(player, enemy);
             ResolveAttacksAndOtherEffects(enemy, player);
+            yield return new WaitForSeconds(resolveDelay);
 
             player.UpdateHealthUI();
             enemy.UpdateHealthUI();
 
-            // 🔹 Reiniciamos defensas temporales al final del turno
+            // Reiniciamos defensas temporales al final del turno
             player.turnDefense = 0;
             enemy.turnDefense = 0;
 
@@ -74,6 +82,7 @@ public class TurnManager : MonoBehaviour
         else Debug.Log("Player Won!");
     }
 
+    // ------------------------- RESOLVE DEFENSES & HEALS -------------------------
     private void ResolveDefensesAndHeals(Character character)
     {
         foreach (var face in character.currentRolls)
@@ -87,6 +96,7 @@ public class TurnManager : MonoBehaviour
         }
     }
 
+    // ------------------------- RESOLVE ATTACKS & OTHER EFFECTS -------------------------
     private void ResolveAttacksAndOtherEffects(Character user, Character target)
     {
         foreach (var face in user.currentRolls)
@@ -100,3 +110,4 @@ public class TurnManager : MonoBehaviour
         }
     }
 }
+

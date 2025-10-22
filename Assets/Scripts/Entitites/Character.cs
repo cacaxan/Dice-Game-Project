@@ -3,8 +3,16 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
+/// <summary>
+/// Clase base de todos los personajes (Player y Enemy)
+/// Maneja stats, defensa temporal, rerolls y dados de turno.
+/// </summary>
 public class Character : MonoBehaviour
 {
+    [Header("Character Data (ScriptableObject)")]
+    [Tooltip("Asignar el ScriptableObject que define stats y dados")]
+    public CharacterData characterData;
+
     [Header("Stats")]
     public string characterName = "Unknown";
     public int maxHealth = 20;
@@ -15,14 +23,36 @@ public class Character : MonoBehaviour
     public Slider healthBar;
     public TMP_Text healthText;
 
-    [Header("Rerolls (only for player)")]
+    [Header("Rerolls (solo para Player)")]
     public int rerolls;
     public int maxRerolls = 2;
 
-    // 🔹 Defensa temporal y dados de este turno
+    // Defensa temporal y dados del turno
     [HideInInspector] public List<DiceFace> currentRolls = new List<DiceFace>();
     [HideInInspector] public int turnDefense = 0;
 
+    [Header("Dice Settings")]
+    public DiceData dice;
+
+    // ------------------------- INICIALIZACIÓN -------------------------
+    public virtual void InitializeCharacter()
+    {
+        if (characterData != null)
+        {
+            characterName = characterData.characterName;
+            maxHealth = characterData.maxHealth;
+            health = maxHealth;
+            defense = characterData.baseDefense;
+            dice = characterData.dice;
+        }
+
+        rerolls = 0;
+        turnDefense = 0;
+        currentRolls.Clear();
+        UpdateHealthUI();
+    }
+
+    // ------------------------- MÉTODOS -------------------------
     public virtual void TakeDamage(int amount, Character source = null)
     {
         int effectiveDamage = Mathf.Max(amount - turnDefense, 0);
@@ -64,6 +94,7 @@ public class Character : MonoBehaviour
         Debug.Log($"{characterName} got debuffed! Duration {p.duration}, Mult {p.multiplier}");
     }
 
+    // ------------------------- UI -------------------------
     public void UpdateHealthUI()
     {
         if (healthText != null)
@@ -73,13 +104,15 @@ public class Character : MonoBehaviour
             healthBar.value = (float)health / maxHealth;
     }
 
+    // ------------------------- RESET -------------------------
     public void ResetStats()
     {
-        health = maxHealth;
-        defense = 0;
-        turnDefense = 0;
-        rerolls = 0;
-        currentRolls.Clear();
-        UpdateHealthUI();
+        InitializeCharacter();
+    }
+
+    // ------------------------- START -------------------------
+    protected virtual void Start()
+    {
+        InitializeCharacter();
     }
 }

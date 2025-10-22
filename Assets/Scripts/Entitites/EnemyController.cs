@@ -1,16 +1,13 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.UI;
-using TMPro;
+using System.Collections;
 
 /// <summary>
-/// Controla al enemigo: lanzamiento automático de dados, resolución de efectos y UI.
+/// Controla al enemigo: tiradas automáticas, UI y resolución.
 /// </summary>
 public class EnemyController : Character
 {
-    [Header("Dice Settings")]
-    public DiceData dice;
+    [Header("Dice Manager")]
     public DiceManager diceManager;
 
     [Header("Dice UI")]
@@ -22,6 +19,7 @@ public class EnemyController : Character
 
     private int diceIndex = 0;
 
+    // ------------------------- TURN FLOW -------------------------
     public void StartTurn()
     {
         currentRolls.Clear();
@@ -39,7 +37,6 @@ public class EnemyController : Character
             DiceFace roll = diceManager.Roll(dice);
             currentRolls.Add(roll);
             diceIndex++;
-
             UpdateDiceUI();
             yield return new WaitForSeconds(delay);
         }
@@ -47,37 +44,29 @@ public class EnemyController : Character
 
     public bool HasRolledAllDice() => currentRolls.Count >= diceSlots.Length;
 
+    // ------------------------- UI -------------------------
     public void UpdateDiceUI()
     {
         for (int i = 0; i < diceSlots.Length; i++)
-        {
-            if (i < currentRolls.Count)
-                diceSlots[i].sprite = currentRolls[i].Image;
-            else
-                diceSlots[i].sprite = null;
-        }
+            diceSlots[i].sprite = i < currentRolls.Count ? currentRolls[i].Image : null;
     }
 
     public void ShowAllDiceFaces()
     {
         if (referencePanel == null || diceFaceSlotPrefab == null) return;
-
-        foreach (Transform child in referencePanel)
-            Destroy(child.gameObject);
+        foreach (Transform child in referencePanel) Destroy(child.gameObject);
 
         foreach (var face in dice.faces)
         {
             GameObject slot = Instantiate(diceFaceSlotPrefab, referencePanel);
-            var image = slot.GetComponent<Image>();
-            if (image != null)
-                image.sprite = face.Image;
+            Image image = slot.GetComponent<Image>();
+            if (image != null) image.sprite = face.Image;
         }
     }
 
-    void Start()
+    protected override void Start()
     {
-        health = maxHealth;
-        UpdateHealthUI();
+        base.Start();
         ShowAllDiceFaces();
     }
 }

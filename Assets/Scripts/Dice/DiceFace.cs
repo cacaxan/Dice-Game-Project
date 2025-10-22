@@ -8,7 +8,7 @@ public class DiceFace : ScriptableObject
     public string displayName;                 
     [TextArea] public string Description;      
     public Sprite Image;                       
-    public RarityType Rarity;                  
+    public DiceRarityType Rarity;              
     public DiceFaceType Type;                  
 
     [Header("Gameplay Properties")]
@@ -80,6 +80,7 @@ public struct EffectParams
     public int extraValue;
 }
 
-public enum RarityType { Common, Rare, Epic, Legendary }
+// 🔹 Enums
+public enum DiceRarityType { Common, Rare, Epic, Legendary }
 public enum DiceFaceType { Null, Attack, Defense, Heal, Reroll, Buff, Debuff, Utility }
 public enum FaceTarget { Enemy, Self }

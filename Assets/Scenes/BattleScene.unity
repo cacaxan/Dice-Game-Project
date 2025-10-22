@@ -1160,6 +1160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 989f9d44fb283be49a2af6a2bc1e6782, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  characterData: {fileID: 11400000, guid: e3547705e7b80f642baf279dbfd9f843, type: 2}
   characterName: Naruto
   maxHealth: 20
   health: 20
@@ -1168,9 +1169,10 @@ MonoBehaviour:
   healthText: {fileID: 505123700}
   rerolls: 0
   maxRerolls: 2
+  currentRolls: []
+  turnDefense: 0
   dice: {fileID: 11400000, guid: 6887147d7db4a1d4e8a6bb870d5bd1e8, type: 2}
   diceManager: {fileID: 942393037}
-  currentRolls: []
   diceSlots:
   - {fileID: 2116009756}
   - {fileID: 128357392}
@@ -1180,6 +1182,7 @@ MonoBehaviour:
   rerollButton: {fileID: 0}
   referencePanel: {fileID: 92065041}
   diceFaceSlotPrefab: {fileID: 105820208325987901, guid: 7f2b4854ddeaff9409218e053e4270d5, type: 3}
+  hasConfirmedAllDice: 0
 --- !u!1 &763519105
 GameObject:
   m_ObjectHideFlags: 0
@@ -1792,10 +1795,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 921004d5190084b45a40ad48217bc880, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  state: 0
   player: {fileID: 700174450}
   enemy: {fileID: 1388246257}
   resolveDelay: 0.5
+  state: 0
 --- !u!1 &991958105
 GameObject:
   m_ObjectHideFlags: 0
@@ -2241,6 +2244,70 @@ RectTransform:
   m_AnchoredPosition: {x: -5, y: 0}
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1324975416
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1324975418}
+  - component: {fileID: 1324975417}
+  m_Layer: 0
+  m_Name: provaPlyaerInspector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1324975417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324975416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 989f9d44fb283be49a2af6a2bc1e6782, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterData: {fileID: 0}
+  characterName: Unknown
+  maxHealth: 20
+  health: 20
+  defense: 0
+  healthBar: {fileID: 0}
+  healthText: {fileID: 0}
+  rerolls: 0
+  maxRerolls: 2
+  currentRolls: []
+  turnDefense: 0
+  dice: {fileID: 0}
+  diceManager: {fileID: 0}
+  diceSlots: []
+  rerollText: {fileID: 0}
+  confirmButton: {fileID: 0}
+  rerollButton: {fileID: 0}
+  referencePanel: {fileID: 0}
+  diceFaceSlotPrefab: {fileID: 0}
+  hasConfirmedAllDice: 0
+--- !u!4 &1324975418
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324975416}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 958.6236, y: 524.9521, z: -17.362482}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1388246255
 GameObject:
   m_ObjectHideFlags: 0
@@ -2285,6 +2352,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e4f0942f2cd3f0488de55c81f775d06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  characterData: {fileID: 11400000, guid: 9d38a962d62968d41a592fe88c9b5cde, type: 2}
   characterName: Sasuke
   maxHealth: 15
   health: 15
@@ -2293,9 +2361,10 @@ MonoBehaviour:
   healthText: {fileID: 1996342513}
   rerolls: 0
   maxRerolls: 2
+  currentRolls: []
+  turnDefense: 0
   dice: {fileID: 11400000, guid: d09a645192bb90842a6748c77bf88e43, type: 2}
   diceManager: {fileID: 942393037}
-  currentRolls: []
   diceSlots:
   - {fileID: 991958107}
   - {fileID: 2008795636}
@@ -3565,3 +3634,4 @@ SceneRoots:
   - {fileID: 942393036}
   - {fileID: 1691711346}
   - {fileID: 1065690781}
+  - {fileID: 1324975418}

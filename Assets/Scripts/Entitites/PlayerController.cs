@@ -1,16 +1,13 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// Controla al jugador: tiradas manuales, rerolls, confirmaciones, UI y resolución de efectos.
+/// Controla al jugador: tiradas manuales, rerolls, confirmaciones y UI.
 /// </summary>
 public class PlayerController : Character
 {
-    [Header("Dice Settings")]
-    public DiceData dice;
+    [Header("Dice Manager")]
     public DiceManager diceManager;
 
     [Header("Dice UI")]
@@ -23,12 +20,10 @@ public class PlayerController : Character
     public Transform referencePanel;
     public GameObject diceFaceSlotPrefab;
 
-    // 🔹 Estado interno de tiradas
     private int diceIndex = 0;
+    [HideInInspector] public bool hasConfirmedAllDice = false;
 
-    [HideInInspector]
-    public bool hasConfirmedAllDice = false;
-
+    // ------------------------- TURN FLOW -------------------------
     public void StartTurn()
     {
         hasConfirmedAllDice = false;
@@ -44,7 +39,6 @@ public class PlayerController : Character
     {
         if (diceIndex >= diceSlots.Length)
         {
-            Debug.Log("All dice rolled!");
             SetButtonsInteractable(false);
             return;
         }
@@ -58,11 +52,8 @@ public class PlayerController : Character
     public void ConfirmDie()
     {
         diceIndex++;
-
         if (diceIndex < diceSlots.Length)
-        {
             RollNextDie();
-        }
         else
         {
             Debug.Log("✅ Player confirmed all dice!");
@@ -77,7 +68,6 @@ public class PlayerController : Character
 
         DiceFace newRoll = diceManager.Roll(dice);
         currentRolls[diceIndex] = newRoll;
-
         Debug.Log($"🔁 Player rerolled slot {diceIndex + 1}: {newRoll.displayName}");
 
         AddRerolls(-1);
@@ -87,30 +77,23 @@ public class PlayerController : Character
 
     public bool HasRolledAllDice() => currentRolls.Count >= diceSlots.Length;
 
+    // ------------------------- UI -------------------------
     public void UpdateDiceUI()
     {
         for (int i = 0; i < diceSlots.Length; i++)
-        {
-            if (i < currentRolls.Count)
-                diceSlots[i].sprite = currentRolls[i].Image;
-            else
-                diceSlots[i].sprite = null;
-        }
+            diceSlots[i].sprite = i < currentRolls.Count ? currentRolls[i].Image : null;
     }
 
     public void ShowAllDiceFaces()
     {
         if (referencePanel == null || diceFaceSlotPrefab == null) return;
-
-        foreach (Transform child in referencePanel)
-            Destroy(child.gameObject);
+        foreach (Transform child in referencePanel) Destroy(child.gameObject);
 
         foreach (var face in dice.faces)
         {
             GameObject slot = Instantiate(diceFaceSlotPrefab, referencePanel);
-            var image = slot.GetComponent<Image>();
-            if (image != null)
-                image.sprite = face.Image;
+            Image image = slot.GetComponent<Image>();
+            if (image != null) image.sprite = face.Image;
         }
     }
 
@@ -126,10 +109,9 @@ public class PlayerController : Character
         if (rerollButton != null) rerollButton.interactable = interactable;
     }
 
-    void Start()
+    protected override void Start()
     {
-        health = maxHealth;
-        UpdateHealthUI();
+        base.Start();
         ShowAllDiceFaces();
     }
 }
