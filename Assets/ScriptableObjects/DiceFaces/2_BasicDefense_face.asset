@@ -15,7 +15,7 @@ MonoBehaviour:
   ID: 2
   displayName: Basic Defense
   Description: "Para un golpe de hasta 4 de da\xF1o"
-  Image: {fileID: 21300000, guid: eca6757fefa2f9f4fa268395052bd4ce, type: 3}
+  Image: {fileID: 1339128893, guid: c0bf3dc8a5afe014facc05ec91cf140a, type: 3}
   Rarity: 0
   Type: 2
   PowerValue: 2
