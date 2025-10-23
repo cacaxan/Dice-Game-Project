@@ -2,9 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// Controla al jugador: tiradas manuales, rerolls, confirmaciones y UI.
-/// </summary>
 public class PlayerController : Character
 {
     [Header("Dice UI")]
@@ -17,20 +14,22 @@ public class PlayerController : Character
     public Transform referencePanel;
     public GameObject diceFaceSlotPrefab;
 
-
-
     private int diceIndex = 0;
     [HideInInspector] public bool hasConfirmedAllDice = false;
+    [HideInInspector] public bool isRolling = false;
+
+    public void InitializeForTurn()
+    {
+        hasConfirmedAllDice = false;
+        isRolling = true;
+        currentRolls.Clear();
+        diceIndex = 0;
+    }
 
     public override void StartTurn()
     {
-        hasConfirmedAllDice = false;
-        currentRolls.Clear();
-        diceIndex = 0;
-
-        AddRerolls(1); // gana 1 reroll al inicio
+        AddRerolls(1);
         UpdateRerollUI();
-
         RollNextDie();
         SetButtonsInteractable(true);
     }
@@ -40,6 +39,7 @@ public class PlayerController : Character
         if (diceIndex >= DicePerTurn)
         {
             SetButtonsInteractable(false);
+            isRolling = false;
             return;
         }
 
@@ -65,6 +65,7 @@ public class PlayerController : Character
             Debug.Log("✅ Player confirmed all dice!");
             SetButtonsInteractable(false);
             hasConfirmedAllDice = true;
+            isRolling = false;
         }
     }
 
@@ -83,7 +84,6 @@ public class PlayerController : Character
 
     public override bool HasRolledAllDice() => currentRolls.Count >= DicePerTurn;
 
-    // ------------------------- UI -------------------------
     public override void UpdateDiceUI()
     {
         for (int i = 0; i < diceSlots.Length; i++)

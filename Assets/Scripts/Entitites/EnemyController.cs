@@ -2,9 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
-/// <summary>
-/// Controla al enemigo: tiradas automáticas y UI.
-/// </summary>
 public class EnemyController : Character
 {
     [Header("Dice UI")]
@@ -14,25 +11,35 @@ public class EnemyController : Character
     public Transform referencePanel;
     public GameObject diceFaceSlotPrefab;
 
-  
-
     private int diceIndex = 0;
+    [HideInInspector] public bool isRolling = false;
 
-    public override void StartTurn()
+    public void InitializeForTurn()
     {
         currentRolls.Clear();
         diceIndex = 0;
+    }
+
+    public override void StartTurn()
+    {
         StartCoroutine(RollAllDiceCoroutine(0.3f));
     }
 
     public IEnumerator RollAllDiceCoroutine(float delay = 0.3f)
     {
-        currentRolls.Clear();
-        diceIndex = 0;
+        isRolling = true;
 
         if (Dice == null)
         {
             Debug.LogError("❌ No DiceData assigned in CharacterData!");
+            isRolling = false;
+            yield break;
+        }
+
+        if (diceManager == null)
+        {
+            Debug.LogError("❌ DiceManager es NULL en EnemyController!");
+            isRolling = false;
             yield break;
         }
 
@@ -41,14 +48,17 @@ public class EnemyController : Character
             DiceFace roll = diceManager.Roll(Dice);
             currentRolls.Add(roll);
             diceIndex++;
+            Debug.Log($"Rolled dice {diceIndex}/{DicePerTurn}: {roll.displayName}");
             UpdateDiceUI();
             yield return new WaitForSeconds(delay);
         }
+
+        isRolling = false;
+        Debug.Log("✅ Enemy finished rolling all dice");
     }
 
     public override bool HasRolledAllDice() => currentRolls.Count >= DicePerTurn;
 
-    // ------------------------- UI -------------------------
     public override void UpdateDiceUI()
     {
         for (int i = 0; i < diceSlots.Length; i++)
@@ -71,6 +81,14 @@ public class EnemyController : Character
     protected override void Start()
     {
         base.Start();
-        ShowAllDiceFaces();
+        if (Dice != null)
+        {
+            for (int i = 0; i < Dice.faces.Length; i++)
+                Debug.Log($"Enemy DiceFace {i}: {(Dice.faces[i] != null ? Dice.faces[i].name : "NULL")}");
+        }
+        else
+        {
+            Debug.LogError("Enemy DiceData is null!");
+        }
     }
 }

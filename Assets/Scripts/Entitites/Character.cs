@@ -62,11 +62,16 @@ public abstract class Character : MonoBehaviour
         UpdateHealthUI();
     }  
 
-    protected virtual void Start()
+    // ------------------------- Cambiado a Awake -------------------------
+    protected virtual void Awake()
     {
+        // Asignar diceManager antes de cualquier StartTurn
         if (diceManager == null)
             diceManager = FindFirstObjectByType<DiceManager>();
+    }
 
+    protected virtual void Start()
+    {
         InitializeCharacter();
     }
 
