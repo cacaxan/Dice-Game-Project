@@ -51,6 +51,7 @@ MonoBehaviour:
   currentRolls: []
   healthBar: {fileID: 0}
   healthText: {fileID: 0}
+  CharacterImage: {fileID: 0}
   dice: {fileID: 11400000, guid: 6887147d7db4a1d4e8a6bb870d5bd1e8, type: 2}
   diceManager: {fileID: 0}
   diceSlots:
@@ -61,6 +62,6 @@ MonoBehaviour:
   confirmButton: {fileID: 0}
   rerollButton: {fileID: 0}
   referencePanel: {fileID: 0}
-  diceFaceSlotPrefab: {fileID: 105820208325987901, guid: 7f2b4854ddeaff9409218e053e4270d5, type: 3}
-  CharacterImage: {fileID: 0}
+  diceFaceSlotPrefab: {fileID: 3421454193125381288, guid: d4729f76b2c576d44ae180ec6f221071, type: 3}
   hasConfirmedAllDice: 0
+  isRolling: 0

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using System.Collections;
 
 public class EnemyController : Character
@@ -65,6 +66,7 @@ public class EnemyController : Character
             diceSlots[i].sprite = i < currentRolls.Count ? currentRolls[i].Image : null;
     }
 
+    // 🔹 NUEVO: igual que Player, muestra caras con info y color
     public override void ShowAllDiceFaces()
     {
         if (referencePanel == null || diceFaceSlotPrefab == null || Dice == null) return;
@@ -72,23 +74,42 @@ public class EnemyController : Character
 
         foreach (var face in Dice.faces)
         {
+            
+
             GameObject slot = Instantiate(diceFaceSlotPrefab, referencePanel);
-            Image image = slot.GetComponent<Image>();
-            if (image != null) image.sprite = face.Image;
+
+            var image = slot.transform.Find("Face_info/FaceImage")?.GetComponent<Image>();
+            var text = slot.transform.Find("Face_info/FaceText_TMP")?.GetComponent<TMP_Text>();
+
+            if (image != null)
+                image.sprite = face.Image;
+
+            if (text != null)
+            {
+                text.text = face.BriefStatistics;
+                text.color = GetColorForType(face.Type);
+            }
+        }
+    }
+
+    private Color GetColorForType(DiceFaceType type)
+    {
+        switch (type)
+        {
+            case DiceFaceType.Attack: return Color.red;
+            case DiceFaceType.Defense: return Color.cyan;
+            case DiceFaceType.Heal: return Color.green;
+            case DiceFaceType.Buff: return new Color(1f, 0.6f, 0f);
+            case DiceFaceType.Debuff: return new Color(0.7f, 0f, 1f);
+            case DiceFaceType.Reroll: return Color.yellow;
+            case DiceFaceType.Utility: return Color.white;
+            default: return Color.gray;
         }
     }
 
     protected override void Start()
     {
         base.Start();
-        if (Dice != null)
-        {
-            for (int i = 0; i < Dice.faces.Length; i++)
-                Debug.Log($"Enemy DiceFace {i}: {(Dice.faces[i] != null ? Dice.faces[i].name : "NULL")}");
-        }
-        else
-        {
-            Debug.LogError("Enemy DiceData is null!");
-        }
+        ShowAllDiceFaces();
     }
 }

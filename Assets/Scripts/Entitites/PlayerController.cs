@@ -90,6 +90,7 @@ public class PlayerController : Character
             diceSlots[i].sprite = i < currentRolls.Count ? currentRolls[i].Image : null;
     }
 
+    // 🔹 NUEVO: muestra todas las caras del dado con sprite + texto de info
     public override void ShowAllDiceFaces()
     {
         if (referencePanel == null || diceFaceSlotPrefab == null || Dice == null) return;
@@ -98,8 +99,34 @@ public class PlayerController : Character
         foreach (var face in Dice.faces)
         {
             GameObject slot = Instantiate(diceFaceSlotPrefab, referencePanel);
-            Image image = slot.GetComponent<Image>();
-            if (image != null) image.sprite = face.Image;
+
+            // Buscar referencias internas
+            var image = slot.transform.Find("Face_info/FaceImage")?.GetComponent<Image>();
+            var text = slot.transform.Find("Face_info/FaceText_TMP")?.GetComponent<TMP_Text>();
+
+            if (image != null)
+                image.sprite = face.Image;
+
+            if (text != null)
+            {
+                text.text = face.BriefStatistics;
+                text.color = GetColorForType(face.Type);
+            }
+        }
+    }
+
+    private Color GetColorForType(DiceFaceType type)
+    {
+        switch (type)
+        {
+            case DiceFaceType.Attack: return Color.red;
+            case DiceFaceType.Defense: return Color.cyan;
+            case DiceFaceType.Heal: return Color.green;
+            case DiceFaceType.Buff: return new Color(1f, 0.6f, 0f); // naranja
+            case DiceFaceType.Debuff: return new Color(0.7f, 0f, 1f); // violeta
+            case DiceFaceType.Reroll: return Color.yellow;
+            case DiceFaceType.Utility: return Color.white;
+            default: return Color.gray;
         }
     }
 
@@ -121,3 +148,4 @@ public class PlayerController : Character
         ShowAllDiceFaces();
     }
 }
+

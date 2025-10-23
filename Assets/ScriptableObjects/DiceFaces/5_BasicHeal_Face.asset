@@ -18,6 +18,7 @@ MonoBehaviour:
   Image: {fileID: 1633287150, guid: c0bf3dc8a5afe014facc05ec91cf140a, type: 3}
   Rarity: 0
   Type: 3
+  BriefStatistics: HP 1
   PowerValue: 1
   Params:
     duration: 0

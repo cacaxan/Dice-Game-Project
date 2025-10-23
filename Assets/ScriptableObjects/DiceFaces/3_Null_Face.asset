@@ -18,6 +18,7 @@ MonoBehaviour:
   Image: {fileID: 455819280, guid: c0bf3dc8a5afe014facc05ec91cf140a, type: 3}
   Rarity: 0
   Type: 0
+  BriefStatistics: '-'
   PowerValue: 0
   Params:
     duration: 0

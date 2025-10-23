@@ -4,19 +4,22 @@ using UnityEngine;
 public class DiceFace : ScriptableObject
 {
     [Header("General Info")]
-    public string ID;                          
-    public string displayName;                 
-    [TextArea] public string Description;      
-    public Sprite Image;                       
-    public DiceRarityType Rarity;              
-    public DiceFaceType Type;                  
+    public string ID;
+    public string displayName;
+    [TextArea] public string Description;
+    public Sprite Image;
+    public DiceRarityType Rarity;
+    public DiceFaceType Type;
+
+    [TextArea(1, 3)]
+    public string BriefStatistics; // ← Texto que aparecerá en la UI
 
     [Header("Gameplay Properties")]
-    public int PowerValue;                     
-    public EffectParams Params;                
+    public int PowerValue;
+    public EffectParams Params;
 
     [Header("Targeting")]
-    public FaceTarget target = FaceTarget.Enemy; 
+    public FaceTarget target = FaceTarget.Enemy;
 
     // 🔹 Ejecutado al resolver el dado
     public void ExecuteEffect(Character user, Character opponent)
@@ -26,31 +29,25 @@ public class DiceFace : ScriptableObject
         switch (Type)
         {
             case DiceFaceType.Null:
-                Debug.Log($"{displayName} has no effect."); 
+                Debug.Log($"{displayName} has no effect.");
                 break;
             case DiceFaceType.Attack:
-                if (targetChar != null)
-                    targetChar.TakeDamage(PowerValue);
+                targetChar?.TakeDamage(PowerValue);
                 break;
             case DiceFaceType.Defense:
-                if (user != null)
-                    user.GainDefense(PowerValue);
+                user?.GainDefense(PowerValue);
                 break;
             case DiceFaceType.Heal:
-                if (targetChar != null)
-                    targetChar.Heal(PowerValue);
+                targetChar?.Heal(PowerValue);
                 break;
             case DiceFaceType.Reroll:
-                if (user != null)
-                    user.AddRerolls(PowerValue);
+                user?.AddRerolls(PowerValue);
                 break;
             case DiceFaceType.Buff:
-                if (targetChar != null)
-                    targetChar.ApplyBuff(Params);
+                targetChar?.ApplyBuff(Params);
                 break;
             case DiceFaceType.Debuff:
-                if (targetChar != null)
-                    targetChar.ApplyDebuff(Params);
+                targetChar?.ApplyDebuff(Params);
                 break;
             case DiceFaceType.Utility:
                 HandleUtility(user, targetChar);
@@ -58,7 +55,7 @@ public class DiceFace : ScriptableObject
         }
     }
 
-    void HandleUtility(Character user, Character targetChar)
+    private void HandleUtility(Character user, Character targetChar)
     {
         if (ID == "steal_reroll")
         {
@@ -68,6 +65,49 @@ public class DiceFace : ScriptableObject
                 targetChar.AddRerolls(-stolen);
                 user.AddRerolls(stolen);
             }
+        }
+    }
+
+#if UNITY_EDITOR
+    // 🔹 Genera automáticamente texto de estadísticas al modificar el asset
+    private void OnValidate()
+    {
+        GenerateBriefStatistics();
+    }
+#endif
+
+    // 🔹 Crea texto según tipo y valores
+    public void GenerateBriefStatistics()
+    {
+        switch (Type)
+        {
+            case DiceFaceType.Null:
+                BriefStatistics = "-";
+                break;
+            case DiceFaceType.Attack:
+                BriefStatistics = $"Atk\n{PowerValue}";
+                break;
+            case DiceFaceType.Defense:
+                BriefStatistics = $"Def\n{PowerValue}";
+                break;
+            case DiceFaceType.Heal:
+                BriefStatistics = $"HP\n{PowerValue}";
+                break;
+            case DiceFaceType.Reroll:
+                BriefStatistics = $"RR\n{PowerValue}";
+                break;
+            case DiceFaceType.Buff:
+                BriefStatistics = $"Buff: +{Params.extraValue} ({Params.duration}s).";
+                break;
+            case DiceFaceType.Debuff:
+                BriefStatistics = $"Debuff: -{Params.extraValue} ({Params.duration}s).";
+                break;
+            case DiceFaceType.Utility:
+                BriefStatistics = "Utility effect.";
+                break;
+            default:
+                BriefStatistics = "Unknown effect.";
+                break;
         }
     }
 }

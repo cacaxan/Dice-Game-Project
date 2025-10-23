@@ -18,6 +18,7 @@ MonoBehaviour:
   Image: {fileID: 782872986, guid: c0bf3dc8a5afe014facc05ec91cf140a, type: 3}
   Rarity: 0
   Type: 1
+  BriefStatistics: ATK 2
   PowerValue: 2
   Params:
     duration: 0
