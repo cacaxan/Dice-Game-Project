@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
-using System.Collections;
 
 /// <summary>
 /// Clase base de todos los personajes (Player y Enemy).
@@ -51,21 +50,16 @@ public abstract class Character : MonoBehaviour
             rerolls = 0;
             dice = characterData.dice;
 
-            // 🖼️ Asignar el sprite del personaje al Image de UI
             if (CharacterImage != null && characterData.characterSprite != null)
-            {
                 CharacterImage.sprite = characterData.characterSprite;
-            }
         }
 
         currentRolls.Clear();
         UpdateHealthUI();
-    }  
+    }
 
-    // ------------------------- Cambiado a Awake -------------------------
     protected virtual void Awake()
     {
-        // Asignar diceManager antes de cualquier StartTurn
         if (diceManager == null)
             diceManager = FindFirstObjectByType<DiceManager>();
     }
