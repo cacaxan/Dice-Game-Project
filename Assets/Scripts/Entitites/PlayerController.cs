@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 public class PlayerController : Character
 {
-    [Header("Dice Slots (final confirmed dice)")]
-    public Image[] diceSlots;
+    [Header("Dice Slots Panel (final confirmed dice)")]
+    public DiceSlotsPanel slotPanel; // Ahora usamos el panel que maneja prefabs de dados
 
     [Header("Dice Preview (Current Dice Box)")]
-    public CurrentDiceBox currentDiceBox; // asigna el objeto de la escena que siempre está visible
+    public CurrentDiceBox currentDiceBox; // Objeto en la escena que siempre está visible
 
     [Header("Reference Panel (All Dice Faces)")]
     public Transform referencePanel;
@@ -19,6 +19,9 @@ public class PlayerController : Character
     [HideInInspector] public bool hasConfirmedAllDice = false;
     [HideInInspector] public bool isRolling = false;
 
+    /// <summary>
+    /// Inicializa variables para el turno y limpia slots de dados confirmados
+    /// </summary>
     public void InitializeForTurn()
     {
         hasConfirmedAllDice = false;
@@ -27,10 +30,13 @@ public class PlayerController : Character
         diceIndex = 0;
 
         // Vaciar los slots de dados confirmados
-        foreach (var slot in diceSlots)
-            if (slot != null) slot.sprite = null;
+        if (slotPanel != null)
+            slotPanel.ClearAll();
     }
 
+    /// <summary>
+    /// Comienza el turno del jugador
+    /// </summary>
     public override void StartTurn()
     {
         AddRerolls(1);
@@ -38,6 +44,9 @@ public class PlayerController : Character
         RollNextDie();
     }
 
+    /// <summary>
+    /// Lanza el siguiente dado
+    /// </summary>
     public void RollNextDie()
     {
         if (diceIndex >= DicePerTurn)
@@ -64,15 +73,19 @@ public class PlayerController : Character
         Debug.Log($"Player rolled slot {diceIndex + 1}: {roll.displayName}");
     }
 
+    /// <summary>
+    /// Confirma el dado actual y lo añade al panel de slots
+    /// </summary>
     public void ConfirmDie()
     {
         if (diceIndex >= DicePerTurn || currentDiceBox == null || currentDiceBox.CurrentFace == null) return;
 
         currentRolls.Add(currentDiceBox.CurrentFace);
-        diceSlots[diceIndex].sprite = currentDiceBox.CurrentFace.Image;
+
+        if (slotPanel != null)
+            slotPanel.SetSlot(diceIndex, currentDiceBox.CurrentFace);
 
         diceIndex++;
-
         currentDiceBox.ShowButtons(false);
 
         if (diceIndex < DicePerTurn)
@@ -85,6 +98,9 @@ public class PlayerController : Character
         }
     }
 
+    /// <summary>
+    /// Re-lanza el dado actual si quedan rerolls
+    /// </summary>
     public void UseReroll()
     {
         if (CurrentRerolls <= 0 || currentDiceBox == null) return;
@@ -98,8 +114,11 @@ public class PlayerController : Character
 
     public override bool HasRolledAllDice() => hasConfirmedAllDice;
 
-    public override void UpdateDiceUI() { /* opcional: mantener slots actualizados */ }
+    public override void UpdateDiceUI() { /* Ahora el panel se encarga de la UI de slots */ }
 
+    /// <summary>
+    /// Muestra todas las caras de dado en el panel de referencia
+    /// </summary>
     public override void ShowAllDiceFaces()
     {
         if (referencePanel == null || diceFaceSlotPrefab == null || Dice == null) return;

@@ -148,6 +148,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8777723983770360255}
+  - component: {fileID: 4027588648740108876}
   m_Layer: 5
   m_Name: DiceFaceUI
   m_TagString: Untagged
@@ -176,6 +177,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 150, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &4027588648740108876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3421454193125381288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54fe6934ab7213b4a8ac50b11f248b4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FaceImage: {fileID: 8304322977537966763}
+  FaceText_TMP: {fileID: 7833040106296411652}
 --- !u!1 &5401337167178578119
 GameObject:
   m_ObjectHideFlags: 0
@@ -268,7 +283,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8415527397179864892
 RectTransform:
   m_ObjectHideFlags: 0
@@ -283,9 +298,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 4833805856423625483}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 116.5, y: -40}
   m_SizeDelta: {x: 65, y: 53.642}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5880542652619466309

@@ -5,10 +5,10 @@ using System.Collections;
 
 public class EnemyController : Character
 {
-    [Header("Dice UI")]
-    public Image[] diceSlots;
+    [Header("Dice Slots Panel (final confirmed dice)")]
+    public DiceSlotsPanel slotPanel; // Panel que muestra los dados confirmados
 
-    [Header("Reference Panel")]
+    [Header("Reference Panel (All Dice Faces)")]
     public Transform referencePanel;
     public GameObject diceFaceSlotPrefab;
 
@@ -19,6 +19,10 @@ public class EnemyController : Character
     {
         currentRolls.Clear();
         diceIndex = 0;
+
+        // Limpiar slots del panel
+        if (slotPanel != null)
+            slotPanel.ClearAll();
     }
 
     public override void StartTurn()
@@ -48,9 +52,13 @@ public class EnemyController : Character
         {
             DiceFace roll = diceManager.Roll(Dice);
             currentRolls.Add(roll);
+
+            // Mostrar en el panel de slots
+            if (slotPanel != null)
+                slotPanel.SetSlot(diceIndex, roll);
+
             diceIndex++;
             Debug.Log($"Rolled dice {diceIndex}/{DicePerTurn}: {roll.displayName}");
-            UpdateDiceUI();
             yield return new WaitForSeconds(delay);
         }
 
@@ -60,22 +68,17 @@ public class EnemyController : Character
 
     public override bool HasRolledAllDice() => currentRolls.Count >= DicePerTurn;
 
-    public override void UpdateDiceUI()
-    {
-        for (int i = 0; i < diceSlots.Length; i++)
-            diceSlots[i].sprite = i < currentRolls.Count ? currentRolls[i].Image : null;
-    }
+    public override void UpdateDiceUI() { /* Ahora lo gestiona el panel */ }
 
-    // 🔹 NUEVO: igual que Player, muestra caras con info y color
     public override void ShowAllDiceFaces()
     {
         if (referencePanel == null || diceFaceSlotPrefab == null || Dice == null) return;
-        foreach (Transform child in referencePanel) Destroy(child.gameObject);
+
+        foreach (Transform child in referencePanel)
+            Destroy(child.gameObject);
 
         foreach (var face in Dice.faces)
         {
-            
-
             GameObject slot = Instantiate(diceFaceSlotPrefab, referencePanel);
 
             var image = slot.transform.Find("Face_info/FaceImage")?.GetComponent<Image>();
@@ -83,7 +86,6 @@ public class EnemyController : Character
 
             if (image != null)
                 image.sprite = face.Image;
-
             if (text != null)
             {
                 text.text = face.BriefStatistics;
@@ -94,17 +96,17 @@ public class EnemyController : Character
 
     private Color GetColorForType(DiceFaceType type)
     {
-        switch (type)
+        return type switch
         {
-            case DiceFaceType.Attack: return Color.red;
-            case DiceFaceType.Defense: return Color.cyan;
-            case DiceFaceType.Heal: return Color.green;
-            case DiceFaceType.Buff: return new Color(1f, 0.6f, 0f);
-            case DiceFaceType.Debuff: return new Color(0.7f, 0f, 1f);
-            case DiceFaceType.Reroll: return Color.yellow;
-            case DiceFaceType.Utility: return Color.white;
-            default: return Color.gray;
-        }
+            DiceFaceType.Attack => Color.red,
+            DiceFaceType.Defense => Color.cyan,
+            DiceFaceType.Heal => Color.green,
+            DiceFaceType.Buff => new Color(1f, 0.6f, 0f),
+            DiceFaceType.Debuff => new Color(0.7f, 0f, 1f),
+            DiceFaceType.Reroll => Color.yellow,
+            DiceFaceType.Utility => Color.white,
+            _ => Color.gray,
+        };
     }
 
     protected override void Start()
